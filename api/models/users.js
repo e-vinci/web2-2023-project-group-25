@@ -16,6 +16,11 @@ const defaultUsers = [
     username: 'admin',
     password: bcrypt.hashSync('admin', saltRounds),
   },
+  {
+    id: 2,
+    username: 'manager',
+    password: bcrypt.hashSync('manager', saltRounds),
+  },
 ];
 
 async function login(username, password) {
