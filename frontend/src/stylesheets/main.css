@@ -1,0 +1,8 @@
+/* styles.css */
+.game-container {
+    background-image: url('../img/background.jpg');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+}
