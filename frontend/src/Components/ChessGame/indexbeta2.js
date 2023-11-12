@@ -24,6 +24,7 @@ class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.clickedCase = null; // Utilisez this pour stocker l'état de la case sélectionnée
         this.piecesSelec = null;
+        this.whitetime = true;
     }
 
     preload() {
@@ -73,33 +74,59 @@ class GameScene extends Phaser.Scene {
                 case2.setInteractive();
                 case2.on('pointerdown', () => {
                     if (this.clickedCase === null) {
-                        this.clickedCase = { x: j, y: i, image: case2 };
-                        case2.setTint(0xccd9ff);
-                        console.log('Case sélectionnée 1:', j, i);
-                    } else if (this.clickedCase.x === j && this.clickedCase.y === i) {
-                        // Dé-sélectionnez la case en cliquant à nouveau dessus
-                        this.clickedCase.image.clearTint();
-                        this.clickedCase = null;
-                    } else if (this.movePiece(this.findPieceByCoordinates(this.clickedCase.x, this.clickedCase.y), j, i)) {
-                        
-                        // Une autre case a été sélectionnée, vous pouvez faire ce que vous voulez ici.
-                        
-                        console.log('Case sélectionnée :', j, i);
-                       
-                            
-                        
-                    } else{
-                        // Ajoutez une autre instruction ici si nécessaire
-                        console.log('c la merde');
+                        // Si aucune pièce n'est sélectionnée
+                        const clickedPiece = this.findPieceByCoordinates(j, i);
+    
+                        if (clickedPiece) {
+                            // Si une pièce est trouvée sur la case
+                            if ((this.whitetime && clickedPiece.couleur === 'blanc') || (!this.whitetime && clickedPiece.couleur === 'noir')) {
+                                // Si la pièce est de la bonne couleur en fonction de whitetime
+                                this.clickedCase = { x: j, y: i, image: case2 };
+                                case2.setTint(0xccd9ff);
+                                console.log('Case sélectionnée 1:', j, i);
+                            } else {
+                                console.log('La pièce n\'est pas de la bonne couleur.');
+                            }
+                        } else {
+                            console.log('Aucune pièce sur la case sélectionnée.');
+                        }
+                    } else {
+                        // Si une pièce est déjà sélectionnée
+                        const clickedPiece = this.findPieceByCoordinates(j, i);
+                        if (this.clickedCase.x === j && this.clickedCase.y === i) {
+                            // Dé-sélectionnez la case en cliquant à nouveau dessus
+                            this.clickedCase.image.clearTint();
+                            this.clickedCase = null;
+                        }else if (clickedPiece) {
+                            // Si une pièce est trouvée sur la case
+                            if ((this.whitetime && clickedPiece.couleur === 'noir') || (!this.whitetime && clickedPiece.couleur === 'blanc')) {
+                                // Si la pièce est de la bonne couleur en fonction de whitetime
+                                if (this.movePiece(this.findPieceByCoordinates(this.clickedCase.x, this.clickedCase.y), j, i)) {
+                                    console.log('Case sélectionnée 2:', j, i);
+                                } else {
+                                    console.log('Le déplacement de la pièce a échoué.');
+                                }
+                            } else {
+                                console.log('La pièce n\'est pas de la bonne couleur.');
+                            }
+                        } else if (this.movePiece(this.findPieceByCoordinates(this.clickedCase.x, this.clickedCase.y), j, i)) {
+                        // S'il n'y a aucune pièce sur la case
+                            console.log('Case sélectionnée :', j, i);
+                        } else {
+                            console.log('Le déplacement de la pièce a échoué.');
+                        } 
                     }
                 });
-
+    
+                    
                 this.cases.push({ x: j, y: i, image: case2 });
 
                 const pieceName = pieceLayout[i][j];
                 if( pieceName){
+                    const couleur = (i < 3) ? 'noir' : 'blanc';
+
                     const pieceImage = this.add.image(caseX, caseY, pieceName).setDisplaySize(tailleCase, tailleCase);
-                    this.pieces.push({ x: j, y: i, image: pieceImage });
+                    this.pieces.push({ x: j, y: i, image: pieceImage, couleur });
                 }
                 
             }
@@ -135,6 +162,11 @@ class GameScene extends Phaser.Scene {
                 this.pieces[index] = updatedPiece;
                 this.clickedCase.image.clearTint();
                 this.clickedCase = null;
+                if(this.whitetime){
+                    this.whitetime = false;
+                }else{
+                    this.whitetime = true;
+                }
                 return true; // Déplacement réussi
             }
         }
@@ -143,7 +175,26 @@ class GameScene extends Phaser.Scene {
     }
     
     
- 
+    // highlightAllowedMoves(selectedPiece, pieces) {
+    //     const allowedMoves = calculateAllowedMoves(selectedPiece, pieces);
+    
+    //     // Parcourez les cases autorisées et changez leur couleur
+    //     allowedMoves.forEach(move => {
+    //         const { x, y } = move;
+    //         const caseToUpdate = this.cases.find(c => c.x === x && c.y === y);
+    
+    //         if (caseToUpdate) {
+    //             caseToUpdate.image.setTint(0x00FF00); // Par exemple, définissez la couleur en vert
+    //         }
+    //     });
+    // }
+    
+    // resetCaseColors() {
+    //     // Réinitialisez la couleur de toutes les cases
+    //     this.cases.forEach(caseData => {
+    //         caseData.image.clearTint();
+    //     });
+    // }
     
     
     // update() {
