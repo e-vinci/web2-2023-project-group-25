@@ -4,48 +4,7 @@ const { parse, serialize } = require('../utils/json');
 
 const jsonDbPath = path.join(__dirname, '/../data/games.json');
 
-const defaultGames = [
-  {
-    id: 1,
-    date: 1698308712412,
-    player1: 'Diegs',
-    player2: 'bot',
-    winner: 'winner',
-    moves: 'moves',
-  },
-  {
-    id: 2,
-    date: 1698308712425,
-    player1: 'player1 id',
-    player2: 'player2 id / bot',
-    winner: 'winner',
-    moves: 'moves',
-  },
-  {
-    id: 3,
-    date: 1698308712423,
-    player1: 'player1 id',
-    player2: 'player2 id / bot',
-    winner: 'winner',
-    moves: 'moves',
-  },
-  {
-    id: 4,
-    date: 1698308712428,
-    player1: 'player1 id',
-    player2: 'player2 id / bot',
-    winner: 'winner',
-    moves: 'moves',
-  },
-  {
-    id: 5,
-    date: 1698308712411,
-    player1: 'player1 id / bot',
-    player2: 'player2 id / bot',
-    winner: 'winner',
-    moves: 'moves',
-  },
-];
+const defaultGames = [];
 
 function readAllGames(orderBy) {
   const orderByDate = orderBy?.includes('date') ? orderBy : undefined;
