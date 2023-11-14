@@ -10,9 +10,9 @@ const { authorize, isAdmin } = require('../utils/auths');
 
 const router = express.Router();
 
-/* Read all the games from the menu
-   GET /games?order=title : ascending order by title
-   GET /games?order=-title : descending order by title
+/* Read all the games
+   GET /games?order=date : ascending order by date
+   GET /games?order=-date : descending order by date
 */
 router.get('/', (req, res) => {
   const allGamesPotentiallyOrdered = readAllGames(req?.query?.order);
@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
   return res.json(allGamesPotentiallyOrdered);
 });
 
-// Read the game identified by an id in the menu
+// Read the game identified by an id
 router.get('/:id', (req, res) => {
   const foundGame = readOneGame(req.params.id);
 
@@ -29,7 +29,7 @@ router.get('/:id', (req, res) => {
   return res.json(foundGame);
 });
 
-// Create a game to be added to the menu.
+// Create a game
 router.post('/', (req, res) => {
   const player1 = req?.body?.player1?.length !== 0 ? req.body.player1 : undefined;
   const player2 = req?.body?.player2?.length !== 0 ? req.body.player2 : undefined;
@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
   return res.json(createdGame);
 });
 
-// Delete a game from the menu based on its id
+// Delete a game based id
 router.delete('/:id', authorize, isAdmin, (req, res) => {
   const deletedGame = deleteOneGame(req.params.id);
 
@@ -69,7 +69,12 @@ router.patch('/:id', authorize, isAdmin, (req, res) => {
     return res.sendStatus(400);
   }
 
-  const updatedGame = updateOneGame(req.params.id, { player1, player2, winner, moves });
+  const updatedGame = updateOneGame(req.params.id, {
+    player1,
+    player2,
+    winner,
+    moves,
+  });
 
   if (!updatedGame) return res.sendStatus(404);
 
