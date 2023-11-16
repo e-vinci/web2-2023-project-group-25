@@ -2,6 +2,7 @@ import Navigate from '../Router/Navigate';
 
 const History = async () => {
   // TODO: Demander au prof pourquoi .then ne fonctionne pas mais async/await oui
+  // TODO: Gérer fail to fetch
   const games = await fetch('http://localhost:3000/games').then((response) => {
     if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
     return response.json();
