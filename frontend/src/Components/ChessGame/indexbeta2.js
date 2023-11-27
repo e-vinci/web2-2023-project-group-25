@@ -24,9 +24,11 @@ class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.clickedCase = null; // Utilisez this pour stocker l'état de la case sélectionnée
         this.selectedPiece = null;
+        this.cases = [];
+        this.pieces = [];
         this.whitetime = true;
-        this.forbiddenMovesWhiteKing = [];
-        this.forbiddenMovesBlackKing = [];
+        this.moves = [];
+        
     }
 
     preload() {
@@ -50,10 +52,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        
-
-        this.cases = [];
-        this.pieces = [];
+ 
 
         const pieceLayout = [
             ['BRook', 'BKnight', 'BBishop', 'BQueen', 'BKing', 'BBishop', 'BKnight', 'BRook'],
@@ -84,6 +83,7 @@ class GameScene extends Phaser.Scene {
                             // Si une pièce est trouvée sur la case
                             if ((this.whitetime && clickedPiece.couleur === 'blanc') || (!this.whitetime && clickedPiece.couleur === 'noir')) {
                                 // Si la pièce est de la bonne couleur en fonction de whitetime
+                                
                                 this.clickedCase = { x: j, y: i, image: case2 };
                                 this.selectedPiece = clickedPiece;
                                 case2.setTint(0xccd9ff);
@@ -108,6 +108,7 @@ class GameScene extends Phaser.Scene {
                             // Si une pièce est trouvée sur la case
                             if ((this.whitetime && clickedPiece.couleur === 'noir') || (!this.whitetime && clickedPiece.couleur === 'blanc')) {
                                 // Si la pièce est de la bonne couleur en fonction de whitetime
+                                
                                 if (this.movePiece(this.selectedPiece, j, i)) {
                                     console.log('Case sélectionnée 2:', j, i);
                                 } else {
@@ -118,7 +119,7 @@ class GameScene extends Phaser.Scene {
                             }
                         } else if (this.movePiece(this.findPieceByCoordinates(this.clickedCase.x, this.clickedCase.y), j, i)) {
                         // S'il n'y a aucune pièce sur la case
-                            console.log('Case sélectionnée :', j, i);
+                            console.log('Case sélectionnée2 :', j, i);
                         } else {
                             console.log('Le déplacement de la pièce a échoué.');
                         } 
@@ -153,11 +154,28 @@ class GameScene extends Phaser.Scene {
     }
     
     movePiece(piece, newX, newY) {
-        const index = this.pieces.findIndex(p => p === piece);
+        let index = this.pieces.findIndex(p => p === piece);
         
+        
+        console.log("Avant le déplacement : ", this.pieces);
         if (index !== -1) {
             // Vérifiez si la nouvelle position est valide (par exemple, dans les limites du plateau de jeu)
-            if (newX >= 0 && newY >= 0 && newX < colonnes && newY < lignes && this.validate(newX,newY)) {
+            if (newX >= 0 && newY >= 0 && newX < colonnes && newY < lignes && this.validate(newX, newY)) {
+                const existingPieceAtNewPos = this.findPieceByCoordinates(newX, newY);
+                
+                if (existingPieceAtNewPos) {
+                    // Supprimez l'image de la pièce existante à la nouvelle position du plateau
+                    existingPieceAtNewPos.image.destroy();
+    
+                    // Supprimez la pièce existante de la table pieces
+                    const existingPieceIndex = this.pieces.findIndex(p => p === existingPieceAtNewPos);
+                    if (existingPieceIndex !== -1) {
+                        this.pieces.splice(existingPieceIndex, 1);
+                        index = this.pieces.findIndex(p => p === piece);
+                    }
+                }
+                console.log("Pièce à capturer : ", existingPieceAtNewPos);
+
                 // Récupérez la pièce existante
                 const existingPiece = this.pieces[index];
     
@@ -170,25 +188,29 @@ class GameScene extends Phaser.Scene {
                 // Créez la nouvelle pièce
                 const updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
     
-                // Mettez à jour la pièce dans le tableau pieces
-                this.pieces[index] = updatedPiece;
+                // Mettez à jour la pièce dans le tableau pieces en utilisant splice
+                this.pieces.splice(index, 1, updatedPiece);
+                console.log("Après le déplacement : ", this.pieces);
+
                 this.resetCaseColors();
                 this.clickedCase = null;
                 this.selectedPiece = null;
-                if(this.whitetime){
+                if (this.whitetime) {
                     this.whitetime = false;
-                }else{
+                } else {
                     this.whitetime = true;
                 }
-
-                
+    
+                this.moves += `${piece.image.texture.key}:${piece.x},${piece.y}-${newX},${newY};`;
+                console.log(this.moves);
                 return true; // Déplacement réussi
             }
-
         }
     
         return false; // Déplacement échoué
     }
+    
+    
     
     highlightAllowedMoves() {
         const allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
@@ -199,7 +221,7 @@ class GameScene extends Phaser.Scene {
             const caseToUpdate = this.cases.find(c => c.x === x && c.y === y);
     
             if (caseToUpdate) {
-                caseToUpdate.image.setTint(0x00FF00); // Par exemple, définissez la couleur en vert
+                caseToUpdate.image.setTint(0x00FF00); // la couleur en vert
             }
         });
     }
@@ -325,16 +347,41 @@ class GameScene extends Phaser.Scene {
         }
 
         if (selectedPiece && (selectedPiece.image.texture.key === 'BKing' || selectedPiece.image.texture.key === 'WKing')) {
-            // Ajouter les mouvements possibles pour le roi
-            // const allowedMovesOpponent = this.getAllowedMovesForOpponent(this.pieces)
-            this.addKingMoves(allowedMoves, selectedPiece, -1, -1);
-            this.addKingMoves(allowedMoves, selectedPiece, -1, 0);
-            this.addKingMoves(allowedMoves, selectedPiece, -1, 1);
-            this.addKingMoves(allowedMoves, selectedPiece, 0, -1);
-            this.addKingMoves(allowedMoves, selectedPiece, 0, 1);
-            this.addKingMoves(allowedMoves, selectedPiece, 1, -1);
-            this.addKingMoves(allowedMoves, selectedPiece, 1, 0);
-            this.addKingMoves(allowedMoves, selectedPiece, 1, 1);
+            const kingMoves = [
+                [-1, -1], [-1, 0], [-1, 1],
+                [0, -1],           [0, 1],
+                [1, -1], [1, 0], [1, 1]
+            ];
+    
+            kingMoves.forEach(offset => {
+                const move = { x: selectedPiece.x + offset[0], y: selectedPiece.y + offset[1] };
+    
+                if (this.isMoveValid(move) || this.isCaptureValid(move)) {
+                    allowedMoves.push(move);
+                }
+            });
+    
+            // Vérifier les mouvements du roi par rapport aux pièces adverses
+            if (!selectedPiece.calculatingMoves) {
+                this.selectedPiece.calculatingMoves = true; // Marquer la pièce comme en cours de calcul pour éviter la récursion infinie
+                this.pieces.forEach(piece => {
+                    if (piece.couleur !== selectedPiece.couleur) {
+                        const opponentMoves = this.calculateAllowedMoves(piece);
+                        opponentMoves.forEach(opponentMove => {
+                            // Vérifier si le mouvement du roi coïncide avec un mouvement de pièce adverse
+                            const kingMoveIndex = allowedMoves.findIndex(move =>
+                                move.x === opponentMove.x && move.y === opponentMove.y
+                            );
+    
+                            // Si le mouvement du roi coïncide avec un mouvement de pièce adverse, le supprimer
+                            if (kingMoveIndex !== -1) {
+                                allowedMoves.splice(kingMoveIndex, 1);
+                            }
+                        });
+                    }
+                });
+                this.selectedPiece.calculatingMoves = false; // Réinitialiser le marquage de la pièce après le calcul des mouvements
+            }
         }
         return allowedMoves;
     }
@@ -376,55 +423,33 @@ class GameScene extends Phaser.Scene {
 
     addKingMoves(allowedMoves, selectedPiece, offsetX, offsetY) {
         const move = { x: selectedPiece.x + offsetX, y: selectedPiece.y + offsetY };
-    
+        
         if ((this.isMoveValid(move)||this.isCaptureValid(move) )) {
             allowedMoves.push(move);
         }
     }
 
-    // isMoveInForbiddenArray(move) {
-    //     const forbiddenMovesArray = this.whiteTime ? this.forbiddenMovesWhiteKing : this.forbiddenMovesBlackKing;
-    //     return forbiddenMovesArray.some(forbiddenMove => forbiddenMove.x === move.x && forbiddenMove.y === move.y);
-    // }
-
-    // updateForbiddenMoves(piece, oldX, oldY) {
-    //     // Supprimez les anciennes cases interdites de la pièce déplacée
-    //     const forbiddenMovesArray = piece.couleur === 'blanc' ? this.forbiddenMovesBlackKing : this.forbiddenMovesWhiteKing;
-    //     const oldMovesIndex = forbiddenMovesArray.findIndex(move => move.x === oldX && move.y === oldY);
-    //     if (oldMovesIndex !== -1) {
-    //         forbiddenMovesArray.splice(oldMovesIndex, 1);
-    //     }
     
-    //     // Ajoutez les nouvelles cases interdites de la pièce déplacée
-    //     const newMoves = this.calculateAllowedMoves(piece);
-    //     newMoves.forEach(move => {
-    //         forbiddenMovesArray.push(move);
-    //     });
-    // }
-    // , allowedMovesForOpponent
-    // && !this.isMoveInArray(move, allowedMovesForOpponent)
-    // /* eslint-disable class-methods-use-this */
-    // isMoveInArray(move, movesArray) {
-    //     return movesArray.some(allowedMove => allowedMove.x === move.x && allowedMove.y === move.y);
-    // }
-    // /* eslint-enable class-methods-use-this */
+    
+    // isAllowedByCoordinates(x, y) {
+    //     return this.allowedMovesForOpponent.find(move => move.x === x && move.y === y);
+    // }  
 
     // getAllowedMovesForOpponent(pieces) {
-    //     const allowedMovesForOpponent = [];
-    
     //     pieces
     //         .filter(piece => piece.couleur === (this.whiteTime ? 'noir' : 'blanc'))
     //         .forEach(piece => {
     //             // Exclure le roi adverse du calcul des mouvements autorisés
     //             if (piece.image.texture.key !== (this.whiteTime ? 'WKing' : 'BKing')) {
     //                 const allowed = this.calculateAllowedMoves(piece);
-    //                 allowedMovesForOpponent.push(...allowed);
+    //                 this.allowedMovesForOpponent.push(...allowed);
     //             }
     //         });
     
-    //     return allowedMovesForOpponent;
+        
     // }
-    
+
+    // mettre cases du roi dans un tableau et vérifier piece par piece qu'elle ne peuvent pas aller dessus
     
 
     resetCaseColors() {
