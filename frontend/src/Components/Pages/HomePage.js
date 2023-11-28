@@ -1,12 +1,14 @@
 import { clearPage } from '../../utils/render';
 import History from '../History/History';
+import chessImage from '../../img/chessImage.jpg';
+
 
 const HomePage = () => {
  
   clearPage();
 
   
-  const main = document.querySelector('main');
+ 
 
   
   const homePageContent = `
@@ -18,6 +20,12 @@ const HomePage = () => {
         <p class="lead">Amusez-vous ;)</p>
       </div>
     </div>
+
+          <div class="row">
+            <div id="groot" class="col-12 col-lg-6 clickable">
+              <img class="chessImage" src="${chessImage}" alt="chessImage" />
+            </div>
+            </div>
     
 
    <div class="row pb-5">
@@ -39,7 +47,7 @@ const HomePage = () => {
 
 
 
-
+const main = document.querySelector('main');
 main.innerHTML = homePageContent;
 
 
