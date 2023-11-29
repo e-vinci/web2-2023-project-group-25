@@ -28,7 +28,12 @@ class GameScene extends Phaser.Scene {
         this.pieces = [];
         this.whitetime = true;
         this.moves = [];
-        
+        this.WKingPosition = null;
+        this.BKingPosition = null;
+
+        this.ischeck = false;
+        this.checkPiece = null;
+        this.check = [];
     }
 
     preload() {
@@ -87,7 +92,10 @@ class GameScene extends Phaser.Scene {
                                 this.clickedCase = { x: j, y: i, image: case2 };
                                 this.selectedPiece = clickedPiece;
                                 case2.setTint(0xccd9ff);
-                                this.highlightAllowedMoves();
+                                if(!this.selectedPiece.blocked){
+                                    this.highlightAllowedMoves();
+                                }
+                                
                                 console.log('Case sélectionnée 1:', j, i);
                             } else {
                                 console.log('La pièce n\'est pas de la bonne couleur.');
@@ -132,6 +140,16 @@ class GameScene extends Phaser.Scene {
                 const pieceName = pieceLayout[i][j];
                 if( pieceName){
                     const couleur = (i < 3) ? 'noir' : 'blanc';
+                    if(pieceName === 'BKing'){
+                        const move = {x:j,y:i}
+                        this.BKingPosition = move;
+                        console.log(this.BKingPosition);
+                    }
+                    if(pieceName === 'WKing'){
+                        const move = {x:j,y:i}
+                        this.WKingPosition = move;
+                        console.log(this.WKingPosition);
+                    }
 
                     const pieceImage = this.add.image(caseX, caseY, pieceName).setDisplaySize(tailleCase, tailleCase);
                     this.pieces.push({ x: j, y: i, image: pieceImage, couleur });
@@ -149,18 +167,26 @@ class GameScene extends Phaser.Scene {
     }  
 
     findPieceWithGoodColor(x,y){
-        const targetColor = this.whitetime ? 'noir' : 'blanc';
+        let targetColor = this.whitetime ? 'noir' : 'blanc';
+        if(this.isCheck){
+            targetColor = this.whitetime ?  'blanc':'noir' ;
+        }
+
+    // Si en échec, inversez la couleur cible
+        
         return this.pieces.find(piece => piece.x === x && piece.y === y && piece.couleur === targetColor);
     }
     
     movePiece(piece, newX, newY) {
         let index = this.pieces.findIndex(p => p === piece);
         
+        if(piece.blocked){
+            return false;
+        }
         
-        console.log("Avant le déplacement : ", this.pieces);
         if (index !== -1) {
             // Vérifiez si la nouvelle position est valide (par exemple, dans les limites du plateau de jeu)
-            if (newX >= 0 && newY >= 0 && newX < colonnes && newY < lignes && this.validate(newX, newY)) {
+            if (newX >= 0 && newY >= 0 && newX < colonnes && newY < lignes && this.validate(newX, newY) ) {
                 const existingPieceAtNewPos = this.findPieceByCoordinates(newX, newY);
                 
                 if (existingPieceAtNewPos) {
@@ -190,7 +216,24 @@ class GameScene extends Phaser.Scene {
     
                 // Mettez à jour la pièce dans le tableau pieces en utilisant splice
                 this.pieces.splice(index, 1, updatedPiece);
-                console.log("Après le déplacement : ", this.pieces);
+                if(this.checkPiece){
+                    // Bloquez les mouvements de la pièce bougée uniquement si elle protège le roi
+                    console.log('La pièce', updatedPiece.image.texture.key, 'bloque le check au roi.');
+                    updatedPiece.blocked = true;
+                    this.checkPiece = null;
+                    this.isCheck = false;
+                }
+                if(this.inCheck(updatedPiece)){
+                    this.checkPiece = this.pieces[index];
+                    this.isCheck = true;
+                    
+                    console.log('Le roi est en échec !');
+                    
+                    
+                }
+                
+                
+                
 
                 this.resetCaseColors();
                 this.clickedCase = null;
@@ -211,10 +254,24 @@ class GameScene extends Phaser.Scene {
     }
     
     
-    
     highlightAllowedMoves() {
-        const allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
-    
+        let allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
+        if (this.checkPiece) {
+            // Si une pièce met en échec, filtrez les mouvements valides
+            const piece = this.checkPiece;
+            this.checkPiece = null;
+            const validMoves = allowedMoves.filter(move => {
+                // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
+                const tempPiece = { ...piece, x: move.x, y: move.y };
+                console.log('temp',tempPiece);
+                // Vérifiez si la simulation conduit toujours à une situation d'échec
+                return this.inCheck2(tempPiece);
+            });
+            console.log('checktableau',validMoves);
+            
+            allowedMoves = validMoves;
+            
+        }
         // Parcourez les cases autorisées et changez leur couleur
         allowedMoves.forEach(move => {
             const { x, y } = move;
@@ -228,10 +285,54 @@ class GameScene extends Phaser.Scene {
 
     validate(x,y){
         const allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
+        console.log('table',allowedMoves)
+        if (this.checkPiece) {
+            // Si une pièce met en échec, filtrez les mouvements valides
+            const piece = this.checkPiece;
+            this.checkPiece = null;
+            const validMoves = allowedMoves.filter(move => {
+                // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
+                const tempPiece = { ...piece, x: move.x, y: move.y };
+                console.log('temp',tempPiece);
+                // Vérifiez si la simulation conduit toujours à une situation d'échec
+                return this.inCheck2(tempPiece);
+            });
+            console.log('checktableau',validMoves);
+            
+            if(validMoves.find(m => m.x === x && m.y === y))return true;
+            return false;
+        }
         if(allowedMoves.find(m => m.x ===x && m.y ===y))return true;
         return false;
     }
-     
+
+    inCheck(piece) {
+        const kingPosition = this.whitetime ? this.BKingPosition : this.WKingPosition;
+
+        // Seulement pour la pièce passée en paramètre
+        const allowedMoves = this.calculateAllowedMoves(piece);
+        if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
+            this.check = allowedMoves;
+            return true;
+        }
+
+        return false;
+    }
+
+    inCheck2(piece) {
+        const kingPosition = this.whitetime ? this.WKingPosition : this.BKingPosition;
+        console.log(kingPosition);
+        // Seulement pour la pièce passée en paramètre
+        const allowedMoves = this.calculateAllowedMoves(piece);
+        console.log("tempallowedmove",allowedMoves);
+        if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
+            this.check = allowedMoves;
+            return true;
+        }
+
+        return false;
+    }
+
     calculateAllowedMoves(selectedPiece) {
         const allowedMoves = [];
         
@@ -240,23 +341,47 @@ class GameScene extends Phaser.Scene {
             // Déplacement vers l'avant (1 case)
             const forwardMove = { x: selectedPiece.x, y: selectedPiece.y + (selectedPiece.couleur === 'blanc' ? -1 : 1) };
             if (this.isMoveValid(forwardMove)) {
-                allowedMoves.push(forwardMove);
+                if(this.checkPiece){
+                    if(this.check.some(mov => mov.x === forwardMove.x && mov.y === forwardMove.y)){
+                        allowedMoves.push(forwardMove);
+                    }
+                }else{
+                   allowedMoves.push(forwardMove); 
+                }
 
                 // Déplacement spécial pour le premier déplacement (2 cases)
                 const doubleForwardMove = { x: selectedPiece.x, y: selectedPiece.y + (selectedPiece.couleur === 'blanc' ? -2 : 2) };
                 if (this.isMoveValid(doubleForwardMove) && ((selectedPiece.couleur === 'blanc' && selectedPiece.y === 6) || (selectedPiece.couleur === 'noir' && selectedPiece.y === 1))) {
-                    allowedMoves.push(doubleForwardMove);
+                    if(this.checkPiece){
+                        if(this.check.some(mov => mov.x === doubleForwardMove.x && mov.y === doubleForwardMove.y)){
+                            allowedMoves.push(doubleForwardMove);
+                        }
+                    }else{
+                       allowedMoves.push(doubleForwardMove); 
+                    }
                 }
             }
             // Capture en diagonale à gauche
             const captureLeftMove = { x: selectedPiece.x - 1, y: selectedPiece.y + (selectedPiece.couleur === 'blanc' ? -1 : 1) };
             if (this.isCaptureValid(captureLeftMove)) {
-                allowedMoves.push(captureLeftMove);
+                if(this.checkPiece){
+                    if(this.check.some(mov => mov.x === captureLeftMove.x && mov.y === captureLeftMove.y)){
+                        allowedMoves.push(captureLeftMove);
+                    }
+                }else{
+                   allowedMoves.push(captureLeftMove); 
+                }
             }
             // Capture en diagonale à droite
             const captureRightMove = { x: selectedPiece.x + 1, y: selectedPiece.y + (selectedPiece.couleur === 'blanc' ? -1 : 1) };
             if (this.isCaptureValid(captureRightMove)) {
-                allowedMoves.push(captureRightMove);
+                if(this.checkPiece){
+                    if(this.check.some(mov => mov.x === captureRightMove.x && mov.y === captureRightMove.y)){
+                        allowedMoves.push(captureRightMove);
+                    }
+                }else{
+                   allowedMoves.push(captureRightMove); 
+                }
             }
         }
         // Ajoutez des conditions spécifiques pour la tour
@@ -265,7 +390,13 @@ class GameScene extends Phaser.Scene {
             for (let i = selectedPiece.y - 1; i >= 0; i--) {
                 const move = { x: selectedPiece.x, y: i };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
-                    allowedMoves.push(move);
+                    if(this.checkPiece){
+                        if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                            allowedMoves.push(move);
+                        }
+                    }else{
+                       allowedMoves.push(move); 
+                    }
                     if (this.findPieceWithGoodColor(move.x, move.y)) {
                         // Si la tour rencontre une pièce de sa propre couleur, arrêtez le mouvement vertical vers le haut
                         break;
@@ -280,7 +411,13 @@ class GameScene extends Phaser.Scene {
             for (let i = selectedPiece.y + 1; i < lignes; i++) {
                 const move = { x: selectedPiece.x, y: i };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
-                    allowedMoves.push(move);
+                    if(this.checkPiece){
+                        if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                            allowedMoves.push(move);
+                        }
+                    }else{
+                       allowedMoves.push(move); 
+                    }
                     if (this.findPieceWithGoodColor(move.x, move.y)) {
                         // Si la tour rencontre une pièce de sa propre couleur, arrêtez le mouvement vertical vers le bas
                         break;
@@ -295,7 +432,13 @@ class GameScene extends Phaser.Scene {
             for (let i = selectedPiece.x + 1; i < colonnes; i++) {
                 const move = { x: i, y: selectedPiece.y };
                 if (this.isMoveValid(move) || this.isCaptureValid(move)) {
-                    allowedMoves.push(move);
+                    if(this.checkPiece){
+                        if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                            allowedMoves.push(move);
+                        }
+                    }else{
+                       allowedMoves.push(move); 
+                    }
                     if (this.findPieceWithGoodColor(move.x, move.y)) {
                         // Si la tour rencontre une pièce de sa propre couleur, arrêtez le mouvement horizontal vers la droite
                         break;
@@ -308,7 +451,13 @@ class GameScene extends Phaser.Scene {
             for (let i = selectedPiece.x - 1; i >= 0; i--) {
                 const move = { x: i, y: selectedPiece.y };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
-                    allowedMoves.push(move);
+                    if(this.checkPiece){
+                        if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                            allowedMoves.push(move);
+                        }
+                    }else{
+                       allowedMoves.push(move); 
+                    }
                     if (this.findPieceWithGoodColor(move.x, move.y)) {
                         // Si la tour rencontre une pièce de sa propre couleur, arrêtez le mouvement horizontal vers la gauche
                         break;
@@ -404,8 +553,14 @@ class GameScene extends Phaser.Scene {
             if (!this.isMoveValid(move)&& !this.isCaptureValid(move)) {
                 break; // Sortir de la boucle si le mouvement n'est pas valide
             }
-    
-            allowedMoves.push(move);
+            if(this.checkPiece){
+                if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                    allowedMoves.push(move);
+                }
+            }else{
+               allowedMoves.push(move); 
+            }
+            
     
             if (this.findPieceByCoordinates(move.x, move.y)) {
                 break; // Sortir de la boucle si une pièce est rencontrée
@@ -417,7 +572,14 @@ class GameScene extends Phaser.Scene {
         const move = { x: selectedPiece.x + offsetX, y: selectedPiece.y + offsetY };
     
         if (this.isMoveValid(move)||this.isCaptureValid(move)) {
-            allowedMoves.push(move);
+
+            if(this.checkPiece){
+                if(this.check.some(mov => mov.x === move.x && mov.y === move.y)){
+                    allowedMoves.push(move);
+                }
+            }else{
+               allowedMoves.push(move); 
+            }
         }
     }
 
