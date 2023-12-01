@@ -93,7 +93,7 @@ class GameScene extends Phaser.Scene {
                                 this.clickedCase = { x: j, y: i, image: case2 };
                                 this.selectedPiece = clickedPiece;
                                 case2.setTint(0xccd9ff);
-                                if(!this.selectedPiece.blocked){
+                                if(this.doesRemovingPiecePutInCheck(clickedPiece)){
                                     this.highlightAllowedMoves();
                                 }
                                 
@@ -186,7 +186,7 @@ class GameScene extends Phaser.Scene {
             return false;
         }
         
-        if (index !== -1) {
+        if (index !== -1 ) {
             // Vérifiez si la nouvelle position est valide (par exemple, dans les limites du plateau de jeu)
             if (newX >= 0 && newY >= 0 && newX < colonnes && newY < lignes && this.validate(newX, newY) ) {
                 const existingPieceAtNewPos = this.findPieceByCoordinates(newX, newY);
@@ -266,15 +266,48 @@ class GameScene extends Phaser.Scene {
         if (indexToRemove !== -1) {
             this.pieces.splice(indexToRemove, 1);
         }
-    
-        // Vérifiez si le roi est en échec après le retrait de la pièce
-        const isCheck = this.inCheck(this.whitetime ? this.BKingPosition : this.WKingPosition);
-    
+        console.log("tab",this.pieces)
+        let resultat = true;
+        
+        const piecesWithout = currentPieces.filter(objet => 
+            objet.image.texture.key !== 'BKing' &&
+            objet.image.texture.key !== 'WKing' &&
+            objet.couleur !== (this.whitetime ? 'blanc' : 'noir')
+        );console.log("attention",piecesWithout);
+        this.whitetime = !this.whitetime;
+        piecesWithout.forEach(objet => {
+            if (this.inCheck(objet)){
+                // Si la fonction de vérification renvoie true pour au moins un objet,
+                // alors considérez que c'est false et mettez à jour le résultat.
+                
+                resultat = false;
+                
+                // Mettez à jour this.allowedMoves avec la position de l'objet
+                this.whitetime = !this.whitetime;
+                const allowedMoves = this.calculateAllowedMoves(currentPieces[indexToRemove]);
+                console.log("contre",allowedMoves);
+                const matchingMoves = allowedMoves.filter(move => move.x === objet.x && move.y === objet.y);
+                console.log("att",matchingMoves);
+                // Ajouter les moves correspondants à this.allowedMovesnow
+                this.allowedMovesnow.push(...matchingMoves);
+                // Mettre en surbrillance les cases dans l'interface utilisateur
+                matchingMoves.forEach(move => {
+                    const caseToUpdate = this.cases.find(c => c.x === move.x && c.y === move.y);
+                    if (caseToUpdate) {
+                        caseToUpdate.image.setTint(0x00FF00); // la couleur en vert
+                    }
+                });
+                this.whitetime = !this.whitetime;
+            }
+        });
+        this.whitetime = !this.whitetime;
         // Rétablissez l'état d'origine
         this.pieces = currentPieces;
-       
+        console.log("tab2",this.pieces)
+        // Le résultat final sera true si la fonction de vérification n'a jamais renvoyé true.
+        console.log("resultat",resultat);
+        return resultat;
     
-        return isCheck;
     }
     
     highlightAllowedMoves() {
@@ -287,7 +320,7 @@ class GameScene extends Phaser.Scene {
             allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
         }
         
-        console.log('lonely!',allowedMoves);
+        
         if (this.checkPiece) {
             // Si une pièce met en échec, filtrez les mouvements valides
             const piece = this.checkPiece;
@@ -295,18 +328,18 @@ class GameScene extends Phaser.Scene {
             const validMoves = allowedMoves.filter(move => {
                 // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
                 const tempPiece = { ...piece, x: move.x, y: move.y };
-                console.log('temp',tempPiece);
+                
                 // Vérifiez si la simulation conduit toujours à une situation d'échec
                 return this.inCheck2(tempPiece);
             });
-            console.log('checktableau!!',validMoves);
+            
             this.checkPiece = piece;
             allowedMoves = validMoves;
             
         }
         this.allowedMovesnow = allowedMoves;
         // Parcourez les cases autorisées et changez leur couleur
-        allowedMoves.forEach(move => {
+        this.allowedMovesnow.forEach(move => {
             const { x, y } = move;
             const caseToUpdate = this.cases.find(c => c.x === x && c.y === y);
     
@@ -326,9 +359,10 @@ class GameScene extends Phaser.Scene {
 
     inCheck(piece) {
         const kingPosition = this.whitetime ? this.BKingPosition : this.WKingPosition;
-
+        
         // Seulement pour la pièce passée en paramètre
         const allowedMoves = this.calculateAllowedMoves(piece);
+        
         if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
             this.check = allowedMoves;
             return true;
@@ -338,11 +372,11 @@ class GameScene extends Phaser.Scene {
     }
 
     inCheck2(piece) {
-        const kingPosition = this.whitetime ? this.WKingPosition : this.BKingPosition;
-        console.log(kingPosition);
+        const kingPosition = this.whitetime ? this.WKingPosition :this.BKingPosition ;
+        
         // Seulement pour la pièce passée en paramètre
         const allowedMoves = this.calculateAllowedMoves(piece);
-        console.log("tempallowedmove",allowedMoves);
+        
         if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
             this.check = allowedMoves;
             return true;
@@ -350,6 +384,9 @@ class GameScene extends Phaser.Scene {
 
         return false;
     }
+
+
+    
 
     calculateAllowedMoves(selectedPiece) {
         const allowedMoves = [];
