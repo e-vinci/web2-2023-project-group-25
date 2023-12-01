@@ -93,11 +93,15 @@ class GameScene extends Phaser.Scene {
                                 this.clickedCase = { x: j, y: i, image: case2 };
                                 this.selectedPiece = clickedPiece;
                                 case2.setTint(0xccd9ff);
-                                if(this.doesRemovingPiecePutInCheck(clickedPiece)){
+                                if(this.selectedPiece.image.texture.key === 'BKing' || this.selectedPiece.image.texture.key === 'WKing'){
+                                    this.highlightAllowedMoves();
+                                    
+                                }else if(this.doesRemovingPiecePutInCheck(clickedPiece)){
                                     this.highlightAllowedMoves();
                                 }
                                 
                                 console.log('Case sélectionnée 1:', j, i);
+                                console.log("!!!",this.allowedMovesnow)
                             } else {
                                 console.log('La pièce n\'est pas de la bonne couleur.');
                             }
@@ -225,15 +229,23 @@ class GameScene extends Phaser.Scene {
                     this.checkPiece = null;
                     this.isCheck = false;
                 }
-                if(this.inCheck(updatedPiece)){
-                    this.checkPiece = this.pieces[index];
-                    this.isCheck = true;
-                    
-                    console.log('Le roi est en échec !');
-                    
-                    
-                }
+                console.log("avant incheck");
+                if(this.selectedPiece.image.texture.key !== 'BKing' && this.selectedPiece.image.texture.key !== 'WKing'){
+                    if(this.inCheck(updatedPiece)){
+                        this.checkPiece = this.pieces[index];
+                        this.isCheck = true;
+                        
+                        console.log('Le roi est en échec !');
+                        
+                        
+                    }
+                }  
                 
+                if (this.selectedPiece.image.texture.key === 'BKing') {
+                    this.BKingPosition = { x: newX, y: newY };
+                } else if (this.selectedPiece.image.texture.key === 'WKing') {
+                    this.WKingPosition = { x: newX, y: newY };
+                }
                 
                 
 
@@ -321,7 +333,7 @@ class GameScene extends Phaser.Scene {
         }
         
         
-        if (this.checkPiece) {
+        if (this.checkPiece && this.selectedPiece.image.texture.key !== 'BKing' && this.selectedPiece.image.texture.key !== 'WKing') {
             // Si une pièce met en échec, filtrez les mouvements valides
             const piece = this.checkPiece;
             this.checkPiece = null;
