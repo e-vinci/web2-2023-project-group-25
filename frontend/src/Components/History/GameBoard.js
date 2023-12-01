@@ -30,6 +30,8 @@ class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
     this.pieces = [];
+    this.piecesMap = [[], [], [], [], [], [], [], []];
+    this.deletedPieces = [];
     this.moves = [];
     this.index = 0;
   }
@@ -38,12 +40,12 @@ class GameScene extends Phaser.Scene {
     const moveStrings = data.split(';');
 
     this.moves = moveStrings.map((moveString) => {
-      const [piece, coordStr] = moveString.split(':');
+      const [piece, coordStr, killedPiece] = moveString.split(':');
       const [sourceStr, destStr] = coordStr.split('-');
       const [sx, sy] = sourceStr.split(',').map(Number);
       const [dx, dy] = destStr.split(',').map(Number);
 
-      return { piece, sourceCoord: { x: sx, y: sy }, destCoord: { x: dx, y: dy } };
+      return { piece, sourceCoord: { x: sx, y: sy }, destCoord: { x: dx, y: dy }, killedPiece };
     });
   }
 
@@ -91,7 +93,7 @@ class GameScene extends Phaser.Scene {
     previousButton.on('pointerdown', () => {
       if (this.index > 0) {
         this.index -= 1;
-        this.movePiece(this.moves[this.index].piece, this.moves[this.index].sourceCoord);
+        this.movePiece(this.moves[this.index].destCoord, this.moves[this.index].sourceCoord, false);
       }
     });
 
@@ -99,114 +101,207 @@ class GameScene extends Phaser.Scene {
     nextButton.setInteractive();
     nextButton.on('pointerdown', () => {
       if (this.index < this.moves.length) {
-        this.movePiece(this.moves[this.index].piece, this.moves[this.index].destCoord);
+        this.movePiece(this.moves[this.index].sourceCoord, this.moves[this.index].destCoord, true);
         this.index += 1;
       }
     });
   }
 
-  movePiece(piece, coordinates) {
-    this.pieces[piece].x = align(coordinates.x);
-    this.pieces[piece].y = align(coordinates.y);
+  findPieceByCoordinates(coordinates) {
+    return this.piecesMap[coordinates.x][coordinates.y];
+  }
+
+  movePiece(coordinatesBefore, coordinatesAfter, forward) {
+    const pieceId = this.findPieceByCoordinates(coordinatesBefore);
+
+    const piece = this.pieces[pieceId];
+
+    const targetId = this.findPieceByCoordinates(coordinatesAfter);
+    const target = this.pieces[targetId];
+
+    if (target) {
+      target.setAlpha(0);
+    }
+
+    let resurectedPieceId;
+    if (forward) {
+      this.deletedPieces.push(targetId);
+    } else {
+      resurectedPieceId = this.deletedPieces.pop();
+    }
+
+    const resurectedPiece = this.pieces[resurectedPieceId];
+    if (resurectedPiece) {
+      resurectedPiece.setAlpha(1);
+    }
+
+    piece.x = align(coordinatesAfter.x);
+    piece.y = align(coordinatesAfter.y);
+
+    this.piecesMap[coordinatesAfter.x][coordinatesAfter.y] = pieceId;
+    this.piecesMap[coordinatesBefore.x][coordinatesBefore.y] = forward ? null : resurectedPieceId;
   }
 
   initializePieces() {
     this.pieces.BRook1 = this.add
       .image(align(0), align(0), 'BRook')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[0][0] = 'BRook1';
+
     this.pieces.BKnight1 = this.add
       .image(align(1), align(0), 'BKnight')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[1][0] = 'BKnight1';
+
     this.pieces.BBishop1 = this.add
       .image(align(2), align(0), 'BBishop')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[2][0] = 'BBishop1';
+
     this.pieces.BQueen = this.add
       .image(align(3), align(0), 'BQueen')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[3][0] = 'BQueen';
+
     this.pieces.BKing = this.add
       .image(align(4), align(0), 'BKing')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[4][0] = 'BKing';
+
     this.pieces.BBishop2 = this.add
       .image(align(5), align(0), 'BBishop')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[5][0] = 'BBishop2';
+
     this.pieces.BKnight2 = this.add
       .image(align(6), align(0), 'BKnight')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[6][0] = 'BKnight2';
+
     this.pieces.BRook2 = this.add
       .image(align(7), align(0), 'BRook')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[7][0] = 'BRook2';
+
     this.pieces.BPawn1 = this.add
       .image(align(0), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[0][1] = 'BPawn1';
+
     this.pieces.BPawn2 = this.add
       .image(align(1), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[1][1] = 'BPawn2';
+
     this.pieces.BPawn3 = this.add
       .image(align(2), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[2][1] = 'BPawn3';
+
     this.pieces.BPawn4 = this.add
       .image(align(3), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[3][1] = 'BPawn4';
+
     this.pieces.BPawn5 = this.add
       .image(align(4), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[4][1] = 'BPawn5';
+
     this.pieces.BPawn6 = this.add
       .image(align(5), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[5][1] = 'BPawn6';
+
     this.pieces.BPawn7 = this.add
       .image(align(6), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[6][1] = 'BPawn7';
+
     this.pieces.BPawn8 = this.add
       .image(align(7), align(1), 'BPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[7][1] = 'BPawn8';
+
     this.pieces.WRook1 = this.add
       .image(align(0), align(7), 'WRook')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[0][7] = 'WRook1';
+
     this.pieces.WKnight1 = this.add
       .image(align(1), align(7), 'WKnight')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[1][7] = 'WKnight1';
+
     this.pieces.WBishop1 = this.add
       .image(align(2), align(7), 'WBishop')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[2][7] = 'WBishop1';
+
     this.pieces.WQueen = this.add
       .image(align(3), align(7), 'WQueen')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[3][7] = 'WQueen';
+
     this.pieces.WKing = this.add
       .image(align(4), align(7), 'WKing')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[4][7] = 'WKing';
+
     this.pieces.WBishop2 = this.add
       .image(align(5), align(7), 'WBishop')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[5][7] = 'WBishop2';
+
     this.pieces.WKnight2 = this.add
       .image(align(6), align(7), 'WKnight')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[6][7] = 'WKnight2';
+
     this.pieces.WRook2 = this.add
       .image(align(7), align(7), 'WRook')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[7][7] = 'WRook2';
+
     this.pieces.WPawn1 = this.add
       .image(align(0), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[0][6] = 'WPawn1';
+
     this.pieces.WPawn2 = this.add
       .image(align(1), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[1][6] = 'WPawn2';
+
     this.pieces.WPawn3 = this.add
       .image(align(2), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[2][6] = 'WPawn3';
+
     this.pieces.WPawn4 = this.add
       .image(align(3), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[3][6] = 'WPawn4';
+
     this.pieces.WPawn5 = this.add
       .image(align(4), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[4][6] = 'WPawn5';
+
     this.pieces.WPawn6 = this.add
       .image(align(5), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[5][6] = 'WPawn6';
+
     this.pieces.WPawn7 = this.add
       .image(align(6), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[6][6] = 'WPawn7';
+
     this.pieces.WPawn8 = this.add
       .image(align(7), align(6), 'WPawn')
       .setDisplaySize(tailleCase, tailleCase);
+    this.piecesMap[7][6] = 'WPawn8';
   }
 }
 

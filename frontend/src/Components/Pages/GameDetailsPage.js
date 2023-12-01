@@ -10,7 +10,6 @@ const GameDetailsPage = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const gameId = urlParams.get('id');
 
-
   // TODO: Gérer fail to fetch
   const gameData = await fetch(`http://localhost:3000/games/${gameId}`).then((response) => {
     if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
