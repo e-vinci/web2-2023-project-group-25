@@ -16,10 +16,21 @@ const GameDetailsPage = async () => {
     return response.json();
   });
 
+  let moves = gameData.moves.split(';');
+  moves = moves.map((move) => {
+    const [piece, coordinates] = move.split(':');
+    const [sourceCoord, destCoord] = coordinates.split('-');
+    return { piece, sourceCoord, destCoord };
+  });
+
   const main = document.querySelector('main');
   main.innerHTML = `
-  <div id="gameDiv" class="game-container d-flex justify-content-center my-3">
-  </div>
+  <div class="row">
+    <div id="gameDiv" class="col game-container d-flex justify-content-center my-3"></div>
+    <div class="col container">${moves.map(
+      (move) => `<div class="row">${move.piece}, ${move.sourceCoord}, ${move.destCoord}</div>`,
+    )}</div>
+  <div>
   `;
 
   const config = {
