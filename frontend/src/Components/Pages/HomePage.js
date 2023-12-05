@@ -12,10 +12,10 @@ const HomePage = () => {
 
   
   const homePageContent = `
-    <div class="container text-center no-scroll">
+    <div class="container text-center overflow-auto ">
       <div class="row pb-5">
         <div class="col">
-          <h3 class="display-4">Bienvenue sur Chess Rumble !</h3>
+          <h3 class="display-3">Bienvenue sur Chess Rumble !</h3>
           <p class="lead">Amusez-vous ;)</p>
         </div>
       </div>
@@ -30,7 +30,7 @@ const HomePage = () => {
 
       <div class="row pb-5">
         <div class="col">
-          <button id="playButton" class="btn btn-primary btn-lg custom-btn">Play</button>
+          <button id="playButton" class="btn btn-lg custom-btn">Play</button>
         </div>
       </div>
 

@@ -1,9 +1,24 @@
 .custom-btn {
-    width: 300px; /* ajustez la largeur selon vos besoins */
+    width: 300px;
   }
 
 .chessImage{
   width: 80%;
   height: 80%;
   
+}
+.bg-custom-color {
+  background-color: #83c5be;
+}
+
+.custom-btn {
+  background-color : #ffddd2 !important;
+  border-color: #ffddd2 !important ;
+  color: black ;
+}
+
+
+
+.custom-navbar {
+  background-color : #ffddd2  ;
 }
