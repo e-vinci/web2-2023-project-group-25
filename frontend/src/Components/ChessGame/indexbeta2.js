@@ -101,7 +101,7 @@ class GameScene extends Phaser.Scene {
                                 }
                                 
                                 console.log('Case sélectionnée 1:', j, i);
-                                console.log("!!!",this.allowedMovesnow)
+                                
                             } else {
                                 console.log('La pièce n\'est pas de la bonne couleur.');
                             }
@@ -149,12 +149,12 @@ class GameScene extends Phaser.Scene {
                     if(pieceName === 'BKing'){
                         const move = {x:j,y:i}
                         this.BKingPosition = move;
-                        console.log(this.BKingPosition);
+                        
                     }
                     if(pieceName === 'WKing'){
                         const move = {x:j,y:i}
                         this.WKingPosition = move;
-                        console.log(this.WKingPosition);
+                        
                     }
 
                     const pieceImage = this.add.image(caseX, caseY, pieceName).setDisplaySize(tailleCase, tailleCase);
@@ -214,12 +214,16 @@ class GameScene extends Phaser.Scene {
                 // Supprimez l'image de la pièce du plateau
                 existingPiece.image.destroy();
     
-                // Créez une nouvelle image pour la pièce à la nouvelle position
-                const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, existingPiece.image.texture.key).setDisplaySize(tailleCase, tailleCase);
-    
-                // Créez la nouvelle pièce
-                const updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
-    
+                let updatedPiece;
+                if ((existingPiece.image.texture.key === 'BPawn'&& newY === 7)|| (existingPiece.image.texture.key === 'WPawn'&& newY === 0)) {
+                    console.log("letsgooo!!");
+                    const newPieceKey = existingPiece.couleur === 'blanc' ? 'WQueen' : 'BQueen';
+                    const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, newPieceKey).setDisplaySize(tailleCase, tailleCase);
+                    updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
+                } else {
+                    const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, existingPiece.image.texture.key).setDisplaySize(tailleCase, tailleCase);
+                    updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
+                }
                 // Mettez à jour la pièce dans le tableau pieces en utilisant splice
                 this.pieces.splice(index, 1, updatedPiece);
                 if(this.checkPiece){
@@ -229,11 +233,23 @@ class GameScene extends Phaser.Scene {
                     this.checkPiece = null;
                     this.isCheck = false;
                 }
-                console.log("avant incheck");
+                
                 if(this.selectedPiece.image.texture.key !== 'BKing' && this.selectedPiece.image.texture.key !== 'WKing'){
                     if(this.inCheck(updatedPiece)){
                         this.checkPiece = this.pieces[index];
+                        
                         this.isCheck = true;
+                        const king = this.whitetime ? this.BKingPosition : this.WKingPosition;
+                        this.selectedPiece = this.findPieceByCoordinates(king.x,king.y);
+                        const kingMoves = this.calculateAllowedMoves(this.selectedPiece);
+                        
+                        if (kingMoves.length === 0) {
+                            // Aucun mouvement possible pour le roi, fin du jeu
+                            console.log("c'est la fin!!!!!");
+                            this.endGame();
+                        }
+                        this.selectedPiece = updatedPiece;
+                        
                         
                         console.log('Le roi est en échec !');
                         
@@ -247,8 +263,6 @@ class GameScene extends Phaser.Scene {
                     this.WKingPosition = { x: newX, y: newY };
                 }
                 
-                
-
                 this.resetCaseColors();
                 this.clickedCase = null;
                 this.selectedPiece = null;
@@ -278,14 +292,14 @@ class GameScene extends Phaser.Scene {
         if (indexToRemove !== -1) {
             this.pieces.splice(indexToRemove, 1);
         }
-        console.log("tab",this.pieces)
+        
         let resultat = true;
         
         const piecesWithout = currentPieces.filter(objet => 
             objet.image.texture.key !== 'BKing' &&
             objet.image.texture.key !== 'WKing' &&
             objet.couleur !== (this.whitetime ? 'blanc' : 'noir')
-        );console.log("attention",piecesWithout);
+        );
         this.whitetime = !this.whitetime;
         piecesWithout.forEach(objet => {
             if (this.inCheck(objet)){
@@ -296,14 +310,20 @@ class GameScene extends Phaser.Scene {
                 
                 // Mettez à jour this.allowedMoves avec la position de l'objet
                 this.whitetime = !this.whitetime;
-                const allowedMoves = this.calculateAllowedMoves(currentPieces[indexToRemove]);
-                console.log("contre",allowedMoves);
+                const current = currentPieces[indexToRemove];
+                const allowedMoves = this.calculateAllowedMoves(current);
+                
                 const matchingMoves = allowedMoves.filter(move => move.x === objet.x && move.y === objet.y);
-                console.log("att",matchingMoves);
+               if(((current.image.texture.key === 'BRook' || current.image.texture.key === 'WRook')&&(objet.image.texture.key === 'BRook' || objet.image.texture.key === 'WRook'))||((current.image.texture.key === 'BQueen' || current.image.texture.key === 'WQueen')&& (objet.image.texture.key === 'BQueen' || (objet.image.texture.key === 'BQueen' )))||((current.image.texture.key === 'BBishop' || current.image.texture.key === 'WBishop')&&(objet.image.texture.key === 'BBishop' || objet.image.texture.key === 'WBishop'))){
+                const match = this.calculateAllowedMoves(objet);
+                const matchingMoves2 = allowedMoves.filter(move => match.some(caseInTableau => caseInTableau.x === move.x && caseInTableau.y === move.y));
+                
+                this.allowedMovesnow.push(...matchingMoves2);
+               }
                 // Ajouter les moves correspondants à this.allowedMovesnow
                 this.allowedMovesnow.push(...matchingMoves);
                 // Mettre en surbrillance les cases dans l'interface utilisateur
-                matchingMoves.forEach(move => {
+                this.allowedMovesnow.forEach(move => {
                     const caseToUpdate = this.cases.find(c => c.x === move.x && c.y === move.y);
                     if (caseToUpdate) {
                         caseToUpdate.image.setTint(0x00FF00); // la couleur en vert
@@ -315,7 +335,7 @@ class GameScene extends Phaser.Scene {
         this.whitetime = !this.whitetime;
         // Rétablissez l'état d'origine
         this.pieces = currentPieces;
-        console.log("tab2",this.pieces)
+        
         // Le résultat final sera true si la fonction de vérification n'a jamais renvoyé true.
         console.log("resultat",resultat);
         return resultat;
@@ -336,7 +356,31 @@ class GameScene extends Phaser.Scene {
         if (this.checkPiece && this.selectedPiece.image.texture.key !== 'BKing' && this.selectedPiece.image.texture.key !== 'WKing') {
             // Si une pièce met en échec, filtrez les mouvements valides
             const piece = this.checkPiece;
-            this.checkPiece = null;
+            
+            const kingPosition = this.whitetime ? this.WKingPosition : this.BKingPosition;
+            
+            
+            console.log(this.checkPiece,"et",kingPosition);
+            if (this.checkPiece.image.texture.key === 'BQueen') {
+                if (this.checkPiece.x === kingPosition.x || this.checkPiece.y === kingPosition.y) {
+                    this.checkPiece.image.setTexture('BRook');
+                } else {
+                    this.checkPiece.image.setTexture('BBishop');
+                }
+            } else if (this.checkPiece.image.texture.key === 'WQueen') {
+                if (this.checkPiece.x === kingPosition.x || this.checkPiece.y === kingPosition.y) {
+                    this.checkPiece.image.setTexture('WRook');
+                } else {
+                    this.checkPiece.image.setTexture('WBishop');
+                }
+            }
+            
+
+            
+
+            allowedMoves = allowedMoves.filter(move => this.check.some(checkMove => checkMove.x === move.x && checkMove.y === move.y));
+
+            
             const validMoves = allowedMoves.filter(move => {
                 // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
                 const tempPiece = { ...piece, x: move.x, y: move.y };
@@ -377,6 +421,7 @@ class GameScene extends Phaser.Scene {
         
         if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
             this.check = allowedMoves;
+            this.check.push({ x: piece.x, y: piece.y });
             return true;
         }
 
@@ -390,13 +435,14 @@ class GameScene extends Phaser.Scene {
         const allowedMoves = this.calculateAllowedMoves(piece);
         
         if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
-            this.check = allowedMoves;
+            
             return true;
         }
 
         return false;
     }
 
+    
 
     
 
@@ -544,13 +590,35 @@ class GameScene extends Phaser.Scene {
                     allowedMoves.push(move);
                 }
             });
+
     
             // Vérifier les mouvements du roi par rapport aux pièces adverses
             if (!selectedPiece.calculatingMoves) {
                 this.selectedPiece.calculatingMoves = true; // Marquer la pièce comme en cours de calcul pour éviter la récursion infinie
+                const currentPieces = [...this.pieces];
+                
+                const index = this.pieces.findIndex(p => p === this.selectedPiece);
+                
+                if (index) {
+                    
+                    this.pieces.splice(index, 1);
+                }
+                
+                
                 this.pieces.forEach(piece => {
-                    if (piece.couleur !== selectedPiece.couleur) {
-                        const opponentMoves = this.calculateAllowedMoves(piece);
+                    
+                    if (piece.couleur !== this.selectedPiece.couleur && (piece.image.texture.key !== 'BKing'&&piece.image.texture.key !== 'WKing')) {
+                        
+                        const isPawn = (pawn) => pawn.image.texture.key === 'BPawn' || pawn.image.texture.key === 'WPawn';
+                        
+                        // Utilisation
+                        const opponentMoves = isPawn(piece)
+                            ? [
+                                { x: piece.x - 1, y: piece.y + (piece.couleur === 'blanc' ? -1 : 1) },
+                                { x: piece.x + 1, y: piece.y + (piece.couleur === 'blanc' ? -1 : 1) }
+                            ]
+                            : this.calculateAllowedMoves(piece);
+
                         opponentMoves.forEach(opponentMove => {
                             // Vérifier si le mouvement du roi coïncide avec un mouvement de pièce adverse
                             const kingMoveIndex = allowedMoves.findIndex(move =>
@@ -564,7 +632,11 @@ class GameScene extends Phaser.Scene {
                         });
                     }
                 });
+                
+            
+                this.pieces = currentPieces;
                 this.selectedPiece.calculatingMoves = false; // Réinitialiser le marquage de la pièce après le calcul des mouvements
+            
             }
         }
         return allowedMoves;
@@ -618,29 +690,6 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    
-    
-    // isAllowedByCoordinates(x, y) {
-    //     return this.allowedMovesForOpponent.find(move => move.x === x && move.y === y);
-    // }  
-
-    // getAllowedMovesForOpponent(pieces) {
-    //     pieces
-    //         .filter(piece => piece.couleur === (this.whiteTime ? 'noir' : 'blanc'))
-    //         .forEach(piece => {
-    //             // Exclure le roi adverse du calcul des mouvements autorisés
-    //             if (piece.image.texture.key !== (this.whiteTime ? 'WKing' : 'BKing')) {
-    //                 const allowed = this.calculateAllowedMoves(piece);
-    //                 this.allowedMovesForOpponent.push(...allowed);
-    //             }
-    //         });
-    
-        
-    // }
-
-    // mettre cases du roi dans un tableau et vérifier piece par piece qu'elle ne peuvent pas aller dessus
-    
-
     resetCaseColors() {
          // Réinitialisez la couleur de toutes les cases
          this.cases.forEach(caseData => {
@@ -648,14 +697,18 @@ class GameScene extends Phaser.Scene {
          });
     }
     
+    endGame() {
+        // Afficher un message de fin
+        this.add.text(
+            this.game.config.width / 2,
+            this.game.config.height / 2,
+            'Fin de la Partie!\nLe joueur 1 gagne!',
+            { fontSize: '48px', fill: '#0c0',fontWeight: 'bold' }
+        ).setOrigin(0.5);
     
-    // update() {
-    //     if (this.clickedCase) {
-    //         console.log('Case sélectionnée :', this.clickedCase.x, this.clickedCase.y);
-    //         // Vous pouvez maintenant gérer la sélection et le déplacement de pièces ici
-            
-    //     }
-    // }
+        // Arrêter le jeu
+        this.scene.pause(); // ou this.scene.stop();
+    }
 }
 
 export default GameScene;
