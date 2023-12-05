@@ -44,7 +44,7 @@ router.post('/', (req, res) => {
 });
 
 // Delete a game based id
-router.delete('/:id', authorize, isAdmin, (req, res) => {
+router.delete('/:id', (req, res) => {
   const deletedGame = deleteOneGame(req.params.id);
 
   if (!deletedGame) return res.sendStatus(404);
