@@ -32,6 +32,11 @@ const Navbar = () => {
                 <a class="nav-link" href="#" data-uri="/new">New Page</a>
               </li>                                               
             </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-uri="/login">Log in</a>
+              </li>
+            </ul>
           </div>
         </div>
       </nav>

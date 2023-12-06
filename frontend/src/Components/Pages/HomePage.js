@@ -50,7 +50,7 @@ const main = document.querySelector('main');
 main.innerHTML = homePageContent;
 
 
-  History();
+ // History();
 };
 
 export default HomePage;
