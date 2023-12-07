@@ -70,6 +70,16 @@ class GameScene extends Phaser.Scene {
             ['WPawn', 'WPawn', 'WPawn', 'WPawn', 'WPawn', 'WPawn', 'WPawn', 'WPawn'],
             ['WRook', 'WKnight', 'WBishop', 'WQueen', 'WKing', 'WBishop', 'WKnight', 'WRook']
         ];
+        const typeLayout = [
+            ['Rook', 'Knight', 'Bishop', 'Queen', 'King', 'Bishop', 'Knight', 'Rook'],
+            ['Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn', 'Pawn'],
+            ['Rook', 'Knight', 'Bishop', 'Queen', 'King', 'Bishop', 'Knight', 'Rook']
+        ];
 
        for (let i = 0; i < lignes; i++) {
             for (let j = 0; j < colonnes; j++) {
@@ -144,6 +154,7 @@ class GameScene extends Phaser.Scene {
                 this.cases.push({ x: j, y: i, image: case2 });
 
                 const pieceName = pieceLayout[i][j];
+                const type = typeLayout[i][j];
                 if( pieceName){
                     const couleur = (i < 3) ? 'noir' : 'blanc';
                     if(pieceName === 'BKing'){
@@ -158,7 +169,7 @@ class GameScene extends Phaser.Scene {
                     }
 
                     const pieceImage = this.add.image(caseX, caseY, pieceName).setDisplaySize(tailleCase, tailleCase);
-                    this.pieces.push({ x: j, y: i, image: pieceImage, couleur });
+                    this.pieces.push({ x: j, y: i, image: pieceImage, couleur,type });
                 }
                 
             }
@@ -242,11 +253,45 @@ class GameScene extends Phaser.Scene {
                         const king = this.whitetime ? this.BKingPosition : this.WKingPosition;
                         this.selectedPiece = this.findPieceByCoordinates(king.x,king.y);
                         const kingMoves = this.calculateAllowedMoves(this.selectedPiece);
-                        
+                        console.log("king",king);
                         if (kingMoves.length === 0) {
                             // Aucun mouvement possible pour le roi, fin du jeu
-                            console.log("c'est la fin!!!!!");
-                            this.endGame();
+                            this.isCheck = false;
+                            let end = true;
+                            this.pieces.forEach(objet => {
+                                if (objet.couleur === this.selectedPiece.couleur && objet.type !== 'King') {
+
+                                    let allowedMovesForObjet = this.calculateAllowedMoves(objet);
+                                    
+                                        // Si une pièce met en échec, filtrez les mouvements valides
+                                                    
+                                    allowedMovesForObjet = allowedMovesForObjet.filter(move => this.check.some(checkMove => checkMove.x === move.x && checkMove.y === move.y));
+                        
+                                    const validMoves = allowedMovesForObjet.filter(move => {
+                                        // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
+                                        const tempPiece = { ...this.checkPiece, x: move.x, y: move.y };
+                                        
+                                        // Vérifiez si la simulation conduit toujours à une situation d'échec
+                                        return this.inCheck(tempPiece);
+                                    });
+                                
+                                    allowedMovesForObjet = validMoves;
+                                    console.log("h",allowedMovesForObjet);
+                                    if (allowedMovesForObjet.length > 0) {
+                                        console.log(objet,"et");
+                                        // Il y a des mouvements possibles pour cette pièce, ne rien faire
+                                        end = false;
+                                    }
+                                    this.allowedMovesnow = [];
+                                }
+                            });
+                        
+                            if(end){
+                               // Aucun mouvement possible pour toutes les pièces de la même couleur, fin du jeu
+                            this.endGame(); 
+                            }
+                    
+                            this.isCheck = true;
                         }
                         this.selectedPiece = updatedPiece;
                         
@@ -344,8 +389,24 @@ class GameScene extends Phaser.Scene {
     
     highlightAllowedMoves() {
         let allowedMoves
+        let isqueen =false;
         if(this.isCheck){
             this.isCheck = false;
+            const kingPosition = this.whitetime ? this.WKingPosition : this.BKingPosition;
+            
+            if (this.checkPiece.type === 'Queen'&& this.selectedPiece.type !== 'King') {
+                isqueen = true;
+                if (this.checkPiece.x === kingPosition.x || this.checkPiece.y === kingPosition.y) {
+                    this.checkPiece.type ='Rook';
+                } else {
+                    this.checkPiece.type ='Bishop';
+                    
+                }
+                this.check = this.calculateAllowedMoves(this.checkPiece);
+                this.check.push({ x: this.checkPiece.x, y: this.checkPiece.y });
+            } 
+            
+            
             allowedMoves = this.calculateAllowedMoves(this.selectedPiece);
             this.isCheck = true;
         }else{
@@ -353,43 +414,23 @@ class GameScene extends Phaser.Scene {
         }
         
         
-        if (this.checkPiece && this.selectedPiece.image.texture.key !== 'BKing' && this.selectedPiece.image.texture.key !== 'WKing') {
+        if (this.checkPiece && this.selectedPiece.type !== 'King') {
             // Si une pièce met en échec, filtrez les mouvements valides
-            const piece = this.checkPiece;
-            
-            const kingPosition = this.whitetime ? this.WKingPosition : this.BKingPosition;
-            
-            
-            console.log(this.checkPiece,"et",kingPosition);
-            if (this.checkPiece.image.texture.key === 'BQueen') {
-                if (this.checkPiece.x === kingPosition.x || this.checkPiece.y === kingPosition.y) {
-                    this.checkPiece.image.setTexture('BRook');
-                } else {
-                    this.checkPiece.image.setTexture('BBishop');
-                }
-            } else if (this.checkPiece.image.texture.key === 'WQueen') {
-                if (this.checkPiece.x === kingPosition.x || this.checkPiece.y === kingPosition.y) {
-                    this.checkPiece.image.setTexture('WRook');
-                } else {
-                    this.checkPiece.image.setTexture('WBishop');
-                }
-            }
-            
-
-            
-
+                        
             allowedMoves = allowedMoves.filter(move => this.check.some(checkMove => checkMove.x === move.x && checkMove.y === move.y));
 
-            
             const validMoves = allowedMoves.filter(move => {
                 // Simulez chaque mouvement comme s'il y avait le type de la pièce qui met en échec
-                const tempPiece = { ...piece, x: move.x, y: move.y };
+                const tempPiece = { ...this.checkPiece, x: move.x, y: move.y };
                 
                 // Vérifiez si la simulation conduit toujours à une situation d'échec
                 return this.inCheck2(tempPiece);
             });
             
-            this.checkPiece = piece;
+            if(isqueen){
+                this.checkPiece.type = 'Queen';
+            }
+            console.log("checkpiece",this.checkPiece);
             allowedMoves = validMoves;
             
         }
@@ -432,6 +473,7 @@ class GameScene extends Phaser.Scene {
         const kingPosition = this.whitetime ? this.WKingPosition :this.BKingPosition ;
         
         // Seulement pour la pièce passée en paramètre
+        
         const allowedMoves = this.calculateAllowedMoves(piece);
         
         if(allowedMoves.find(move => move.x === kingPosition.x && move.y === kingPosition.y)){
@@ -450,7 +492,7 @@ class GameScene extends Phaser.Scene {
         const allowedMoves = [];
         
         // Ajoutez des conditions spécifiques pour le pion
-        if (selectedPiece && (selectedPiece.image.texture.key === 'BPawn' || selectedPiece.image.texture.key === 'WPawn')) {
+        if (selectedPiece && (selectedPiece.type === 'Pawn' )) {
             // Déplacement vers l'avant (1 case)
             const forwardMove = { x: selectedPiece.x, y: selectedPiece.y + (selectedPiece.couleur === 'blanc' ? -1 : 1) };
             if (this.isMoveValid(forwardMove)) {
@@ -482,7 +524,7 @@ class GameScene extends Phaser.Scene {
             }
         }
         // Ajoutez des conditions spécifiques pour la tour
-        if (selectedPiece && (selectedPiece.image.texture.key === 'BRook' || selectedPiece.image.texture.key === 'WRook'||selectedPiece.image.texture.key === 'BQueen' || selectedPiece.image.texture.key === 'WQueen')) {
+        if (selectedPiece && (selectedPiece.type === 'Rook' || selectedPiece.type === 'Queen')) {
             // Mouvement vertical vers le haut
             for (let i = selectedPiece.y - 1; i >= 0; i--) {
                 const move = { x: selectedPiece.x, y: i };
@@ -550,7 +592,7 @@ class GameScene extends Phaser.Scene {
             }
         }
         // Ajoutez des conditions spécifiques pour le fou
-        if (selectedPiece && (selectedPiece.image.texture.key === 'BBishop' || selectedPiece.image.texture.key === 'WBishop'||selectedPiece.image.texture.key === 'BQueen' || selectedPiece.image.texture.key === 'WQueen')) {
+        if (selectedPiece && (selectedPiece.type === 'Bishop' || selectedPiece.type === 'Queen')) {
             // Déplacement en diagonale en haut à gauche
             this.addDiagonalMoves(allowedMoves, selectedPiece, -1, -1);
     
@@ -564,7 +606,7 @@ class GameScene extends Phaser.Scene {
             this.addDiagonalMoves(allowedMoves, selectedPiece, 1, 1);
         }
         // Ajoutez des conditions spécifiques pour le cavalier
-        if (selectedPiece && (selectedPiece.image.texture.key === 'BKnight' || selectedPiece.image.texture.key === 'WKnight')) {
+        if (selectedPiece && (selectedPiece.type === 'Knight')) {
             // Ajouter les mouvements en L possibles pour le cavalier
             this.addKnightMoves(allowedMoves, selectedPiece, -2, -1);
             this.addKnightMoves(allowedMoves, selectedPiece, -2, 1);
@@ -576,7 +618,7 @@ class GameScene extends Phaser.Scene {
             this.addKnightMoves(allowedMoves, selectedPiece, 2, 1);
         }
 
-        if (selectedPiece && (selectedPiece.image.texture.key === 'BKing' || selectedPiece.image.texture.key === 'WKing')) {
+        if (selectedPiece && (selectedPiece.type === 'King')) {
             const kingMoves = [
                 [-1, -1], [-1, 0], [-1, 1],
                 [0, -1],           [0, 1],
