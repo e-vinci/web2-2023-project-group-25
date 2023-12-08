@@ -1,4 +1,4 @@
-import Navigate from '../Router/Navigate';
+// import Navigate from '../Router/Navigate';
 import { clearPage } from '../../utils/render';
 
 const RegisterPage = () => {
@@ -21,7 +21,7 @@ const RegisterPage = () => {
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
+            <button type="submit" class="btn btn-primary w-100 custom-btn">Register</button>
         </form>
         <div class="mt-3 text-center">
             <p>Already have an account? <a href="/login">Login here</a></p>
@@ -36,7 +36,7 @@ const main = document.querySelector('main');
 main.innerHTML = registerPageContent;
 
 
-  //History();
+  
 };
 
 export default RegisterPage;

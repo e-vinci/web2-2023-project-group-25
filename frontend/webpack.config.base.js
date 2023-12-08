@@ -103,6 +103,9 @@ module.exports = {
     new CleanWebpackPlugin({
       root: path.resolve(__dirname, '../'),
     }),
+    new webpack.ProvidePlugin({
+      anime: 'animejs/lib/anime.es.js',
+    }),
     /* For more advanced use cases, these two global variables determine
     which renderer is included in the Phaser build. If you only want to run
     your game with WebGL, then you’d set WEBGL_RENDERER to true,

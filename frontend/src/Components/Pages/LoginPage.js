@@ -1,5 +1,6 @@
-import Navigate from '../Router/Navigate';
+// import Navigate from '../Router/Navigate';
 import { clearPage } from '../../utils/render';
+
 
 const LoginPage = () => {
  
@@ -21,7 +22,7 @@ const LoginPage = () => {
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary w-100 custom-btn">Login</button>
             </form>
             <div class="mt-3 text-center">
                 <p>Don't have an account? <a href="/register" data-uri="/register">Register here</a></p>
@@ -36,7 +37,7 @@ const main = document.querySelector('main');
 main.innerHTML = loginPageContent;
 
 
-  //History();
+  // History();
 };
 
 export default LoginPage;
