@@ -8,7 +8,7 @@ const Navbar = () => {
   const navbar = `
   <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Add your brand here</a>
+          <a class="navbar-brand" href="#">CHESS RUMBLE</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -29,7 +29,7 @@ const Navbar = () => {
                 <a class="nav-link" href="#" data-uri="/game">Game</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" data-uri="/new">New Page</a>
+                <a class="nav-link" href="#" data-uri="/new">historique</a>
               </li>                                               
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

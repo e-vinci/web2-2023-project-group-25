@@ -1,5 +1,6 @@
 import { clearPage } from '../../utils/render';
 
+
 const GameDetails = async () => {
   clearPage();
 
