@@ -14,10 +14,10 @@ const router = express.Router();
    GET /games?order=date : ascending order by date
    GET /games?order=-date : descending order by date
 */
-router.get('/', (req, res) => {
-  const allGamesPotentiallyOrdered = readAllGames(req?.query?.order);
+router.get('/', (res) => {
+  const allGames = readAllGames();
 
-  return res.json(allGamesPotentiallyOrdered);
+  return res.json(allGames);
 });
 
 // Read the game identified by an id
@@ -36,14 +36,14 @@ router.post('/', (req, res) => {
   const winner = req?.body?.winner?.length !== 0 ? req.body.winner : undefined;
   const moves = req?.body?.moves?.length !== 0 ? req.body.moves : undefined;
 
-  if (!player1 || !player2 || !winner || !moves) return res.sendStatus(400); // error code '400 Bad request'
+  if (!player1 || !player2 || !winner || !moves) return res.sendStatus(400);
 
   const createdGame = createOneGame(player1, player2, winner, moves);
 
   return res.json(createdGame);
 });
 
-// Delete a game based id
+// Delete a game based on id
 router.delete('/:id', (req, res) => {
   const deletedGame = deleteOneGame(req.params.id);
 
@@ -60,11 +60,11 @@ router.patch('/:id', authorize, isAdmin, (req, res) => {
   const moves = req?.body?.moves;
 
   if (
-    (!player1 && !player2 && !winner && !moves) ||
-    player1?.length === 0 ||
-    player2?.length === 0 ||
-    winner?.length === 0 ||
-    moves?.length === 0
+    (!player1 && !player2 && !winner && !moves)
+    || player1?.length === 0
+    || player2?.length === 0
+    || winner?.length === 0
+    || moves?.length === 0
   ) {
     return res.sendStatus(400);
   }

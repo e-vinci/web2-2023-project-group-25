@@ -6,15 +6,10 @@ const jsonDbPath = path.join(__dirname, '/../data/games.json');
 
 const defaultGames = [];
 
-function readAllGames(orderBy) {
-  const orderByDate = orderBy?.includes('date') ? orderBy : undefined;
-  let orderedGames;
+function readAllGames() {
   const games = parse(jsonDbPath, defaultGames);
-  if (orderByDate) orderedGames = [...games].sort((a, b) => a.date - b.date);
-  if (orderByDate === '-date') orderedGames = orderedGames.reverse();
 
-  const allGamesPotentiallyOrderd = orderedGames ?? games;
-  return allGamesPotentiallyOrderd;
+  return games;
 }
 
 function readOneGame(id) {
