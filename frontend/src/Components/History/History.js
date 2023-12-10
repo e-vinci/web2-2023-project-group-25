@@ -1,5 +1,6 @@
 import Navigate from '../Router/Navigate';
 
+
 const History = async () => {
   // TODO: Demander au prof pourquoi .then ne fonctionne pas mais async/await oui
   const games = await fetch('http://localhost:3000/games').then((response) => {
