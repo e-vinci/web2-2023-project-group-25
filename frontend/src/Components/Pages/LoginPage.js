@@ -1,4 +1,4 @@
-// import Navigate from '../Router/Navigate';
+import Navigate from '../Router/Navigate';
 import { setAuthenticatedUser } from '../../utils/auths';
 import Navbar from '../Navbar/Navbar';
 import { clearPage } from '../../utils/render';
