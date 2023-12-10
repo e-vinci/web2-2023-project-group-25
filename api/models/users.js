@@ -13,22 +13,22 @@ const jsonDbPath = path.join(__dirname, '/../data/users.json');
 const defaultUsers = [
   {
     id: 1,
-    username: 'adminJakub',
-    password: bcrypt.hashSync('adminJakub', saltRounds),
+    username: 'Diego',
+    password: bcrypt.hashSync('Diego', saltRounds),
   },
   {
     id: 2,
-    username: 'adminJosue',
-    password: bcrypt.hashSync('adminJosue', saltRounds),
+    username: 'Josue',
+    password: bcrypt.hashSync('Josue', saltRounds),
   },
   {
     id: 3,
-    username: 'adminDiego',
-    password: bcrypt.hashSync('adminDiego', saltRounds),
+    username: 'Jakub',
+    password: bcrypt.hashSync('Jakub', saltRounds),
   },{
     id: 4,
-    username: 'adminAli',
-    password: bcrypt.hashSync('adminAli', saltRounds),
+    username: 'Ali',
+    password: bcrypt.hashSync('Ali', saltRounds),
   },
 ];
 

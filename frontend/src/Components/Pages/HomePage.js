@@ -1,5 +1,4 @@
 import { clearPage } from '../../utils/render';
-import History from '../History/History';
 import chessImage from '../../img/chessImage.jpg';
 
 
@@ -8,9 +7,7 @@ const HomePage = () => {
   clearPage();
 
   
- 
 
-  
   const homePageContent = `
     <div class="container text-center overflow-auto ">
       <div class="row pb-5">
@@ -50,7 +47,6 @@ const main = document.querySelector('main');
 main.innerHTML = homePageContent;
 
 
- // History();
 };
 
 export default HomePage;

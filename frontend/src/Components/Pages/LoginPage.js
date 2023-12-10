@@ -1,10 +1,13 @@
 import Navigate from '../Router/Navigate';
+import { setAuthenticatedUser } from '../../utils/auths';
+import Navbar from '../Navbar/Navbar';
 import { clearPage } from '../../utils/render';
 
 const LoginPage = () => {
- 
+    
     clearPage();
-
+    
+    //Creation of the login page 
     const loginPageContent =`
     <div class="container login-container">
         <h2 class="text-center mb-4">Login</h2>
@@ -29,14 +32,43 @@ const LoginPage = () => {
     </div>
     `;
 
-
-
-
 const main = document.querySelector('main');
 main.innerHTML = loginPageContent;
 
+const login = document.querySelector("form");
+login.addEventListener('submit', onLogin);
 
-  //History();
+
+//function qui va appeler l'api pour se connecter
+async function onLogin(e) {
+    e.preventDefault();
+  
+    const username = document.querySelector('#username').value;
+    const password = document.querySelector('#password').value;
+  
+    const options = {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+  
+    const response = await fetch('/api/auths/login', options);
+  
+    if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+  
+    const authenticatedUser = await response.json();
+  
+    setAuthenticatedUser(authenticatedUser);
+  
+    Navbar();
+  
+    Navigate('/');
+  };
 };
 
 export default LoginPage;
