@@ -83,8 +83,8 @@ class GameScene extends Phaser.Scene {
             ['Rook', 'Knight', 'Bishop', 'Queen', 'King', 'Bishop', 'Knight', 'Rook']
         ];
 
-       for (let i = 0; i < lignes; i++) {
-            for (let j = 0; j < colonnes; j++) {
+       for (let i = 0; i < lignes; i+= 1) {
+            for (let j = 0; j < colonnes; j+= 1) {
                 const caseX = j * tailleCase + 0.5151 * tailleCase;
                 const caseY = i * tailleCase + 0.5151 * tailleCase;
 
@@ -741,7 +741,7 @@ class GameScene extends Phaser.Scene {
         // Ajoutez des conditions spécifiques pour la tour
         if (selectedPiece && (selectedPiece.type === 'Rook' || selectedPiece.type === 'Queen')) {
             // Mouvement vertical vers le haut
-            for (let i = selectedPiece.y - 1; i >= 0; i--) {
+            for (let i = selectedPiece.y - 1; i >= 0; i-= 1) {
                 const move = { x: selectedPiece.x, y: i };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
                     
@@ -758,7 +758,7 @@ class GameScene extends Phaser.Scene {
             }
     
             // Mouvement vertical vers le bas
-            for (let i = selectedPiece.y + 1; i < lignes; i++) {
+            for (let i = selectedPiece.y + 1; i < lignes; i+= 1) {
                 const move = { x: selectedPiece.x, y: i };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
                     
@@ -775,7 +775,7 @@ class GameScene extends Phaser.Scene {
             }
     
             // Mouvement horizontal
-            for (let i = selectedPiece.x + 1; i < colonnes; i++) {
+            for (let i = selectedPiece.x + 1; i < colonnes; i+= 1) {
                 const move = { x: i, y: selectedPiece.y };
                 if (this.isMoveValid(move) || this.isCaptureValid(move)) {
                     
@@ -790,7 +790,7 @@ class GameScene extends Phaser.Scene {
                     break;
                 }
             }
-            for (let i = selectedPiece.x - 1; i >= 0; i--) {
+            for (let i = selectedPiece.x - 1; i >= 0; i-= 1) {
                 const move = { x: i, y: selectedPiece.y };
                 if (this.isMoveValid(move)|| this.isCaptureValid(move)) {
                    
@@ -1027,7 +1027,7 @@ isPathClearForCastle(king, x) {
     }
     
     addDiagonalMoves(allowedMoves, selectedPiece, directionX, directionY) {
-        for (let i = 1; i < Math.min(colonnes, lignes); i++) {
+        for (let i = 1; i < Math.min(colonnes, lignes); i+= 1) {
             const move = { x: selectedPiece.x + i * directionX, y: selectedPiece.y + i * directionY };
     
             if (!this.isMoveValid(move)&& !this.isCaptureValid(move)) {

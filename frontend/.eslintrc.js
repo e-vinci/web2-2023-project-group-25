@@ -11,6 +11,6 @@ module.exports = {
   rules: {
     'linebreak-style': 0,
     'no-use-before-define': ['error', 'nofunc'],
-    'no-plusplus': 'off', // Désactive la règle no-plusplus
+    
   },
 };
