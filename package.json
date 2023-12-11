@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "animejs": "^3.2.2",
-    "gsap": "^3.12.3"
-  }
-}
