@@ -1,4 +1,5 @@
 import { clearPage } from '../../utils/render';
+/* eslint-disable */
 import anime from 'animejs/lib/anime.es.js';
 import chessImage from '../../img/chessImage.jpg';
 

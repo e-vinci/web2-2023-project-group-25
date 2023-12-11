@@ -1,6 +1,8 @@
 import { setAuthenticatedUser } from '../../utils/auths';
 import Navbar from '../Navbar/Navbar';
 import Navigate from '../Router/Navigate';
+/* eslint-disable */
+import anime from 'animejs/lib/anime.es.js';
 
 const RegisterPage = () => {
 
@@ -21,7 +23,7 @@ const RegisterPage = () => {
                     <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
                     <div id="passwordError" class="text-danger"></div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Register</button>
+                <button type="submit" class="btn btn-primary custom-btn" id="registerButton">Register</button>
             </form>
             <div class="mt-3 text-center">
                 <p>Already have an account? <a href="/login">Login here</a></p>
@@ -31,6 +33,26 @@ const RegisterPage = () => {
 
 const main = document.querySelector('main');
 main.innerHTML = registerPageContent;
+
+const registerButton = document.getElementById('registerButton');
+
+registerButton.addEventListener('mouseover', () => {
+  anime({
+    targets: registerButton,
+    width: '+=100px', 
+    easing: 'linear',
+    duration: 150,
+  });
+});
+
+registerButton.addEventListener('mouseout', () => {
+  anime({
+    targets: registerButton,
+    width: '-=100px', 
+    easing: 'linear',
+    duration: 150,
+  });
+});
 
 const register = document.querySelector("form");
 register.addEventListener('submit', onRegister);

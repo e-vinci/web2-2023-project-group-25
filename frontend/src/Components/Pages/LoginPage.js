@@ -2,13 +2,15 @@ import Navigate from '../Router/Navigate';
 import { setAuthenticatedUser } from '../../utils/auths';
 import Navbar from '../Navbar/Navbar';
 import { clearPage } from '../../utils/render';
+/* eslint-disable */
+import anime from 'animejs/lib/anime.es.js';
 
 
 const LoginPage = () => {
     
     clearPage();
     
-    //Creation of the login page 
+    // Creation of the login page 
     const loginPageContent =`
     <div class="container login-container">
         <h2 class="text-center mb-4">Login</h2>
@@ -25,7 +27,7 @@ const LoginPage = () => {
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 custom-btn">Login</button>
+                <button type="submit" class="btn btn-primary  custom-btn" id="loginButton">Login</button>
             </form>
             <div class="mt-3 text-center">
                 <p>Don't have an account? <a href="/register" data-uri="/register">Register here</a></p>
@@ -36,11 +38,31 @@ const LoginPage = () => {
 const main = document.querySelector('main');
 main.innerHTML = loginPageContent;
 
+const loginButton = document.getElementById('loginButton');
+
+loginButton.addEventListener('mouseover', () => {
+  anime({
+    targets: loginButton,
+    width: '+=100px', // Increase width by 50 pixels (adjust as needed)
+    easing: 'linear',
+    duration: 150,
+  });
+});
+
+loginButton.addEventListener('mouseout', () => {
+  anime({
+    targets: loginButton,
+    width: '-=100px', // Decrease width by 50 pixels (adjust as needed)
+    easing: 'linear',
+    duration: 300,
+  });
+});
+
 const login = document.querySelector("form");
 login.addEventListener('submit', onLogin);
 
 
-//function qui va appeler l'api pour se connecter
+// function qui va appeler l'api pour se connecter
 async function onLogin(e) {
     e.preventDefault();
   
