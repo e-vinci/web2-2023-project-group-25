@@ -87,7 +87,12 @@ async function onRegister(e) {
   
     const response = await fetch('/api/auths/register', options);
   
-    if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+    if (!response.ok){
+        const passwordError = document.querySelector('#passwordError');
+        passwordError.textContent = 'Le username existe déjà!';
+        return;
+    }
+    passwordError.textContent = '';
   
     const authenticatedUser = await response.json();
   

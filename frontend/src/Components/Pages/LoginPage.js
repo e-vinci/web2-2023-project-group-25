@@ -22,6 +22,7 @@ const LoginPage = () => {
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                    <div id="passwordError" class="text-danger"></div>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="rememberMe">
@@ -68,7 +69,7 @@ async function onLogin(e) {
   
     const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
-  
+
     const options = {
       method: 'POST',
       body: JSON.stringify({
@@ -79,13 +80,22 @@ async function onLogin(e) {
         'Content-Type': 'application/json',
       },
     };
+
+    //throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
   
     const response = await fetch('/api/auths/login', options);
   
-    if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+    if (!response.ok) {
+      const passwordError = document.querySelector('#passwordError');
+      passwordError.textContent = 'Le mot de passe/username ne correspond pas.';
+      return; 
+    }
+
+    const passwordError = document.querySelector('#passwordError');
+    passwordError.textContent = '';
   
     const authenticatedUser = await response.json();
-  
+    
     setAuthenticatedUser(authenticatedUser);
   
     Navbar();
