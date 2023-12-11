@@ -2,6 +2,8 @@ import anime from 'animejs';
 import { clearPage } from '../../utils/render';
 import chessImage from '../../img/chessImage.jpg';
 import History from '../History/History';
+import Navigate from '../Router/Navigate';
+import { isAuthenticated } from '../../utils/auths';
 
 const HomePage = () => {
   clearPage();
@@ -57,6 +59,13 @@ const HomePage = () => {
       scale: 1,
       duration: 300,
     });
+  });
+  playButton.addEventListener('click', () =>{
+    if(isAuthenticated()){
+      Navigate('/game');
+    }else{
+      Navigate('/login');
+    }
   });
   History();
 };
