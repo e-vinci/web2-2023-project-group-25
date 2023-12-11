@@ -11,11 +11,10 @@ const { authorize, isAdmin } = require('../utils/auths');
 const router = express.Router();
 
 /* Read all the games
-   GET /games?order=date : ascending order by date
-   GET /games?order=-date : descending order by date
-*/
-router.get('/', (res) => {
-  const allGames = readAllGames();
+ */
+router.get('/', (req, res) => {
+  const user = req?.query?.user;
+  const allGames = readAllGames(user);
 
   return res.json(allGames);
 });
@@ -60,11 +59,11 @@ router.patch('/:id', authorize, isAdmin, (req, res) => {
   const moves = req?.body?.moves;
 
   if (
-    (!player1 && !player2 && !winner && !moves)
-    || player1?.length === 0
-    || player2?.length === 0
-    || winner?.length === 0
-    || moves?.length === 0
+    (!player1 && !player2 && !winner && !moves) ||
+    player1?.length === 0 ||
+    player2?.length === 0 ||
+    winner?.length === 0 ||
+    moves?.length === 0
   ) {
     return res.sendStatus(400);
   }

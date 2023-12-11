@@ -1,14 +1,16 @@
 import Navigate from '../Router/Navigate';
-
+import { getAuthenticatedUser } from '../../utils/auths';
 
 const History = async () => {
   let games;
   try {
-    games = await fetch('http://localhost:3000/games').then((response) => {
-      if (!response.ok)
-        throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
-      return response.json();
-    });
+    games = await fetch(`http://localhost:3000/games?user=${getAuthenticatedUser().username}`).then(
+      (response) => {
+        if (!response.ok)
+          throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+        return response.json();
+      },
+    );
   } catch (error) {
     console.log(error);
   }
@@ -47,7 +49,7 @@ function renderHistory(games) {
       </thead>
       <tbody>
       ${
-        formattedGames
+        formattedGames.length > 0
           ? formattedGames
               .map(
                 (game) => `

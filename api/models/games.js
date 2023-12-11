@@ -6,8 +6,11 @@ const jsonDbPath = path.join(__dirname, '/../data/games.json');
 
 const defaultGames = [];
 
-function readAllGames() {
-  const games = parse(jsonDbPath, defaultGames);
+function readAllGames(user) {
+  let games = parse(jsonDbPath, defaultGames);
+  if (user) {
+    games = games.filter((game) => game.player === user);
+  }
 
   return games;
 }
