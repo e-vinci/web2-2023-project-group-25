@@ -3,26 +3,24 @@ import { getAuthenticatedUser } from '../../utils/auths';
 
 const History = async () => {
   let games;
+  const user = getAuthenticatedUser().username;
   try {
-    games = await fetch(`http://localhost:3000/games?user=${getAuthenticatedUser().username}`).then(
-      (response) => {
-        if (!response.ok)
-          throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
-        return response.json();
-      },
-    );
+    games = await fetch(`http://localhost:3000/games?user=${user}`).then((response) => {
+      if (!response.ok)
+        throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+      return response.json();
+    });
   } catch (error) {
     console.log(error);
   }
 
-  renderHistory(games);
+  renderHistory(games, user);
 
   attachOnClickEventToWatchButton();
   attachOnClickEventToDeleteButton();
 };
 
-// TODO: Changer 'pseudo du joueur connecté' ci-dessous
-function renderHistory(games) {
+function renderHistory(games, user) {
   let formattedGames;
   if (games) {
     formattedGames = games.map((game, index) => {
@@ -57,11 +55,11 @@ function renderHistory(games) {
             <td>${game.num}</td>
             <td>${game.date}</td>
             ${
-              game.winner === 'pseudo du joueur connecté'
+              game.winner === user
                 ? `<td><i class="bi bi-check-circle-fill"></i></td>`
                 : `<td><i class="bi bi-x-circle-fill"></i></td>`
             }
-            <td>${game.player2}</td>
+            <td>${game.opponent}</td>
             <td class="col text-end">
               <button type="button" value="${game.id}" class="watch-button btn btn-primary btn-sm">
                 <i class="bi bi-eye-fill"></i>
@@ -122,3 +120,5 @@ function attachOnClickEventToDeleteButton() {
 }
 
 export default History;
+
+// TODO: Fix delete button

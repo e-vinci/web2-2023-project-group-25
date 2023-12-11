@@ -60,10 +60,10 @@ const HomePage = () => {
       duration: 300,
     });
   });
-  playButton.addEventListener('click', () =>{
-    if(isAuthenticated()){
+  playButton.addEventListener('click', () => {
+    if (isAuthenticated()) {
       Navigate('/game');
-    }else{
+    } else {
       Navigate('/login');
     }
   });
@@ -71,5 +71,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-// TODO: fix delete button
