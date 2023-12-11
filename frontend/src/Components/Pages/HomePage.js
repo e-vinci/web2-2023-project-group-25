@@ -2,14 +2,11 @@ import { clearPage } from '../../utils/render';
 /* eslint-disable */
 import anime from 'animejs/lib/anime.es.js';
 import chessImage from '../../img/chessImage.jpg';
+import History from '../History/History';
 
 const HomePage = () => {
   clearPage();
 
-  
- 
-
-  
   const homePageContent = `
     <div class="container text-center overflow-auto ">
       <div class="row pb-5">
@@ -37,35 +34,34 @@ const HomePage = () => {
         <div class="col history-section">
           <h3>Historique des parties</h3>
           <p>Consultez vos parties.</p>
+          <div id="history-wrapper"></div>
         </div>
       </div>
     </div>
   `;
 
-
-
   const main = document.querySelector('main');
   main.innerHTML = homePageContent;
 
-  
   const playButton = document.getElementById('playButton');
   playButton.addEventListener('mouseenter', () => {
     anime({
       targets: playButton,
-      scale: 1.4, 
-      duration: 300, 
+      scale: 1.4,
+      duration: 300,
     });
   });
 
   playButton.addEventListener('mouseleave', () => {
     anime({
       targets: playButton,
-      scale: 1, 
-      duration: 300, 
+      scale: 1,
+      duration: 300,
     });
   });
+  History();
 };
 
-
-
 export default HomePage;
+
+// TODO: fix delete button

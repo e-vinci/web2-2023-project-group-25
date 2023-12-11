@@ -2,14 +2,16 @@ import Navigate from '../Router/Navigate';
 
 
 const History = async () => {
-  // TODO: Demander au prof pourquoi .then ne fonctionne pas mais async/await oui
-  const games = await fetch('http://localhost:3000/games').then((response) => {
-    if (!response.ok) throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
-    return response.json();
-  });
-  // .then((games) => {
-  //   renderHistory(games);
-  // });
+  let games;
+  try {
+    games = await fetch('http://localhost:3000/games').then((response) => {
+      if (!response.ok)
+        throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
+      return response.json();
+    });
+  } catch (error) {
+    console.log(error);
+  }
 
   renderHistory(games);
 
@@ -19,16 +21,19 @@ const History = async () => {
 
 // TODO: Changer 'pseudo du joueur connecté' ci-dessous
 function renderHistory(games) {
-  const formattedGames = games.map((game, index) => {
-    const gameCopy = { ...game };
-    gameCopy.num = index + 1;
-    gameCopy.date = new Date(game.date).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+  let formattedGames;
+  if (games) {
+    formattedGames = games.map((game, index) => {
+      const g = { ...game };
+      g.num = index + 1;
+      g.date = new Date(game.date).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+      return g;
     });
-    return gameCopy;
-  });
+  } else formattedGames = null;
 
   const history = `
   <div class="table-responsive">
@@ -41,9 +46,11 @@ function renderHistory(games) {
         <th class='col'></th>
       </thead>
       <tbody>
-      ${formattedGames
-        .map(
-          (game) => `
+      ${
+        formattedGames
+          ? formattedGames
+              .map(
+                (game) => `
           <tr>
             <td>${game.num}</td>
             <td>${game.date}</td>
@@ -72,7 +79,9 @@ function renderHistory(games) {
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                      <button type="button" class="confirm-delete-button btn btn-danger">Delete game</button>
+                      <button type="button" value="${
+                        game.id
+                      }" class="confirm-delete-button btn btn-danger" data-bs-dismiss="modal">Delete game</button>
                     </div>
                   </div>
                 </div>
@@ -80,8 +89,10 @@ function renderHistory(games) {
             </td>  
           </tr>
           `,
-        )
-        .join('\n')}
+              )
+              .join('\n')
+          : `<tr><td colspan='7' class="text-center">Aucun partie n'a été trouvée</td></tr>`
+      }
       </tbody>
     </table>
   </div>`;
@@ -103,8 +114,7 @@ function attachOnClickEventToDeleteButton() {
   const deleteButton = document.querySelectorAll('.confirm-delete-button');
   deleteButton.forEach((button) => {
     button.addEventListener('click', () => {
-      // fetch('DELETE', `http://localhost:3000/games/${button.getAttribute('value')}`); TODO: Check api call
-      alert('Hello there !');
+      fetch(`http://localhost:3000/games/${button.getAttribute('value')}`, { method: 'DELETE' });
     });
   });
 }
