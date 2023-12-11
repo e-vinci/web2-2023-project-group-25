@@ -173,9 +173,9 @@ class GameScene extends Phaser.Scene {
                         this.WKingPosition = move;
                         
                     }
-
+                    const hasMoved = false;
                     const pieceImage = this.add.image(caseX, caseY, pieceName).setDisplaySize(tailleCase, tailleCase);
-                    this.pieces.push({ x: j, y: i, image: pieceImage, couleur,type });
+                    this.pieces.push({ x: j, y: i, image: pieceImage, couleur,type ,hasMoved});
                 }
                 
             }
@@ -226,23 +226,27 @@ class GameScene extends Phaser.Scene {
 
                 // Récupérez la pièce existante
                 const existingPiece = this.pieces[index];
-    
-                // Supprimez l'image de la pièce du plateau
-                existingPiece.image.destroy();
-    
                 let updatedPiece;
-                if ((existingPiece.image.texture.key === 'BPawn'&& newY === 7)|| (existingPiece.image.texture.key === 'WPawn'&& newY === 0)) {
-                    console.log("letsgooo!!");
-                    const newPieceKey = existingPiece.couleur === 'blanc' ? 'WQueen' : 'BQueen';
-                    const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, newPieceKey).setDisplaySize(tailleCase, tailleCase);
-                    updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
+                if (existingPiece.type === 'King' && Math.abs(newX - existingPiece.x) > 1) {
+                    // Effectuez le roque
+                    this.performCastle(existingPiece, newX, newY);
                 } else {
-                    const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, existingPiece.image.texture.key).setDisplaySize(tailleCase, tailleCase);
-                    updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage };
-                }
-                // Mettez à jour la pièce dans le tableau pieces en utilisant splice
-                this.pieces.splice(index, 1, updatedPiece);
+                    // Supprimez l'image de la pièce du plateau
+                    existingPiece.image.destroy();
                 
+                    
+                    if ((existingPiece.image.texture.key === 'BPawn' && newY === 7) || (existingPiece.image.texture.key === 'WPawn' && newY === 0)) {
+                        console.log("letsgooo!!");
+                        const newPieceKey = existingPiece.couleur === 'blanc' ? 'WQueen' : 'BQueen';
+                        const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, newPieceKey).setDisplaySize(tailleCase, tailleCase);
+                        updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage,hasMoved: true };
+                    } else {
+                        const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, existingPiece.image.texture.key).setDisplaySize(tailleCase, tailleCase);
+                        updatedPiece = { ...piece, x: newX, y: newY, image: newPieceImage,hasMoved:true };
+                    }
+                    // Mettez à jour la pièce dans le tableau pieces en utilisant splice
+                    this.pieces.splice(index, 1, updatedPiece);
+                }
                 if(this.checkPiece){
                     // Bloquez les mouvements de la pièce bougée uniquement si elle protège le roi
                     this.checkPiece = null;
@@ -332,6 +336,8 @@ class GameScene extends Phaser.Scene {
                     this.WKingPosition = { x: newX, y: newY };
                 }
                 
+                
+                
                 this.resetCaseColors();
                 this.clickedCase = null;
                 this.selectedPiece = null;
@@ -340,8 +346,9 @@ class GameScene extends Phaser.Scene {
                 } else {
                     this.whitetime = true;
                 }
+                
     
-                this.moves += `${piece.image.texture.key}:${piece.x},${piece.y}-${newX},${newY};`;
+                this.moves += `${piece.type}:${piece.x},${piece.y}-${newX},${newY};`;
                 console.log(this.moves);
                 this.allowedMovesnow = [];
                 return true; // Déplacement réussi
@@ -350,6 +357,48 @@ class GameScene extends Phaser.Scene {
     
         return false; // Déplacement échoué
     }
+
+    performCastle(existingPiece, newX, newY) {
+        console.log("performCastle");
+        
+        // Détruire l'image actuelle du roi
+        existingPiece.image.destroy();
+    
+        // Créer une nouvelle image pour le roi à la nouvelle position
+        const newPieceImage = this.add.image(newX * tailleCase + 0.5151 * tailleCase, newY * tailleCase + 0.5151 * tailleCase, existingPiece.image.texture.key).setDisplaySize(tailleCase, tailleCase);
+    
+        // Mettre à jour la pièce avec les nouvelles coordonnées et la nouvelle image
+        const updatedPiece = { ...existingPiece, x: newX, y: newY, image: newPieceImage };
+    
+        // Mettre à jour la pièce dans le tableau pieces en utilisant splice
+        const index = this.pieces.findIndex(piece => piece === existingPiece);
+        if (index !== -1) {
+            this.pieces.splice(index, 1, updatedPiece);
+        }
+    
+        // Mettre à jour la position de la tour en fonction de new x
+        const rookX = newX > existingPiece.x ? 7 : 0; // Nouvelle position en X de la tour
+        const rook = this.findPieceByCoordinates(rookX, existingPiece.y);
+    
+        if (rook) {
+            // Détruire l'image actuelle de la tour
+            rook.image.destroy();
+    
+            // Créer une nouvelle image pour la tour à la nouvelle position
+            const newRookImage = this.add.image((newX + (newX > existingPiece.x ? -1 : 1)) * tailleCase + 0.5151 * tailleCase, existingPiece.y * tailleCase + 0.5151 * tailleCase, rook.image.texture.key).setDisplaySize(tailleCase, tailleCase);
+    
+            // Mettre à jour la tour avec les nouvelles coordonnées et la nouvelle image
+            const updatedRook = { ...rook, x: newX + (newX > existingPiece.x ? -1 : 1), y: existingPiece.y, image: newRookImage };
+    
+            //
+        // Mettre à jour la tour dans le tableau pieces en utilisant splice
+        const rookIndex = this.pieces.findIndex(piece => piece === rook);
+        if (rookIndex !== -1) {
+            this.pieces.splice(rookIndex, 1, updatedRook);
+        }
+    }
+}
+    
 
     discoverCheck(selectedPiece) {
         // Réinitialise la variable globale checkPiece2
@@ -533,6 +582,7 @@ class GameScene extends Phaser.Scene {
     highlightAllowedMoves() {
         let allowedMoves
         let isqueen =false;
+        
         if(this.isCheck){
             
             this.isCheck = false;
@@ -593,6 +643,8 @@ class GameScene extends Phaser.Scene {
         allowedMoves = null;
     }
     
+
+
 
     validate(x,y){
         
@@ -795,8 +847,15 @@ class GameScene extends Phaser.Scene {
                     allowedMoves.push(move);
                 }
             });
+            console.log("avantcastle",allowedMoves);
+            // Assurez-vous que getCastleMoves renvoie un tableau
+            const castleMoves = this.getCastleMoves(selectedPiece);
 
-    
+            // Ajoutez chaque élément de castleMoves à allowedMoves
+            castleMoves.forEach(move => {
+                allowedMoves.push(move);
+            });
+            console.log("aprescastle",allowedMoves);
             // Vérifier les mouvements du roi par rapport aux pièces adverses
             
                  // Marquer la pièce comme en cours de calcul pour éviter la récursion infinie
@@ -829,7 +888,7 @@ class GameScene extends Phaser.Scene {
                             const kingMoveIndex = allowedMoves.findIndex(move =>
                                 move.x === opponentMove.x && move.y === opponentMove.y
                             );
-    
+                            
                             // Si le mouvement du roi coïncide avec un mouvement de pièce adverse, le supprimer
                             if (kingMoveIndex !== -1) {
                                 allowedMoves.splice(kingMoveIndex, 1);
@@ -838,7 +897,7 @@ class GameScene extends Phaser.Scene {
                     }
                 });
                 
-            
+                console.log("apresfiltre",allowedMoves);
                 this.pieces = currentPieces;
                  // Réinitialiser le marquage de la pièce après le calcul des mouvements
             
@@ -846,6 +905,115 @@ class GameScene extends Phaser.Scene {
         }
         return allowedMoves;
     }
+
+    
+
+
+getCastleMoves(king) {
+    const castleMoves = [];
+
+    // Vérifiez si le roque est possible vers la droite
+    const rightCastle = this.canCastle(king, 'right');
+    if (rightCastle) {
+        console.log("roijepush");
+        castleMoves.push({ x: king.x + 2, y: king.y });
+    }
+
+    // Vérifiez si le roque est possible vers la gauche
+    const leftCastle = this.canCastle(king, 'left');
+    if (leftCastle) {
+        castleMoves.push({ x: king.x - 2, y: king.y });
+    }
+
+    return castleMoves;
+}
+
+canCastle(king, side) {
+    // ...
+    if (king.hasMoved) {
+        return false;
+    }
+
+    let rookX;
+    if (side === 'right') {
+        rookX = 7;
+    } else if (side === 'left') {
+        rookX = 0;
+    }
+    const rook = this.findPieceByCoordinates(rookX, king.y);
+    console.log("rookforc",rook);
+    
+    if(!rook){
+        return false;
+    }
+    console.log(rook.hasMoved);
+    if(rook.hasMoved || rook.type !== 'Rook'){
+        return false;
+    }
+    if (side === 'right') {
+        console.log("droite");
+        // Vérifiez si le roque vers la droite est possible
+        // Utilisez la logique précédente pour vérifier la possibilité de roque vers la droite
+        return this.isPathClearForCastle(king, rookX);
+    } 
+    if (side === 'left') {
+        console.log("gauche");
+        // Vérifiez si le roque vers la gauche est possible
+        // Utilisez la logique précédente pour vérifier la possibilité de roque vers la gauche
+        return this.isPathClearForCastle(king, rookX);
+    }
+
+    return false;
+}
+
+// Ajoutez cette fonction pour vérifier si le chemin est dégagé pour le roque
+isPathClearForCastle(king, x) {
+    const direction = x > king.x ? 1 : -1; // 1 pour la droite, -1 pour la gauche
+    const startCol = king.x + direction;
+    const endCol = x ;
+
+    const path = [];
+    // Parcourez les colonnes entre le roi et la tour
+    for (let col = startCol; col !== endCol; col += direction) {
+        // Vérifiez si une pièce est présente sur la colonne actuelle
+        path.push({ x: col, y: king.y });
+        console.log("kingmove",col,king.y);
+        if (this.findPieceByCoordinates(col, king.y)) {
+            return false; // Le chemin n'est pas dégagé
+        }
+    }
+    let isNotSafe = false;
+    this.pieces.forEach(piece => {
+                    
+        if (piece.couleur !== king.couleur && (piece.type !== 'King')) {
+            
+            const isPawn = (pawn) => pawn.type === 'Pawn';
+            
+            // Utilisation
+            const opponentMoves = isPawn(piece)
+                ? [
+                    { x: piece.x - 1, y: piece.y + (piece.couleur === 'blanc' ? -1 : 1) },
+                    { x: piece.x + 1, y: piece.y + (piece.couleur === 'blanc' ? -1 : 1) }
+                ]
+                : this.calculateAllowedMoves(piece);
+
+            opponentMoves.forEach(opponentMove => {
+                // Vérifier si le mouvement pathcoïncide avec un mouvement de pièce adverse
+                const MoveIndex = path.findIndex(move =>
+                    move.x === opponentMove.x && move.y === opponentMove.y
+                );
+                
+                // Si le mouvement du roi coïncide avec un mouvement de pièce adverse, le supprimer
+                if (MoveIndex !== -1) {
+                    isNotSafe = true;
+                }
+            });
+        }
+    });
+    if(isNotSafe)return false;
+    console.log("// Le chemin est dégagé");
+    return true; // Le chemin est dégagé
+}
     
     isMoveValid(move) {
         
@@ -904,6 +1072,7 @@ class GameScene extends Phaser.Scene {
     
     endGame() {
         // Afficher un message de fin
+        // this.moves
         this.add.text(
             this.game.config.width / 2,
             this.game.config.height / 2,
