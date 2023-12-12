@@ -33,7 +33,7 @@ function renderHistory(games, user) {
       });
       return g;
     });
-  } else formattedGames = null;
+  } else formattedGames = [];
 
   const history = `
   <div class="table-responsive">
