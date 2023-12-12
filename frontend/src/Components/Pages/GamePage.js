@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import GameScene from '../Game/GameScene';
 
+
 let game;
 
 const GamePage = () => {

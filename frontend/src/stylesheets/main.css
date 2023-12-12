@@ -1,0 +1,26 @@
+
+.chessImage{
+  width: 60%;
+  height: 60%;
+  
+}
+.bg-custom-color {
+  background-color: #83c5be;
+}
+
+.custom-btn {
+  width: 300px;
+  background-color : #ffddd2 !important;
+  border-color: #ffddd2 !important ;
+  color: black ;
+}
+
+.btn-primary { 
+  color: #e29578;
+}
+
+
+
+.custom-navbar {
+  background-color : #ffddd2  ;
+}
