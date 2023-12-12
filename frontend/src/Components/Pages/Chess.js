@@ -14,8 +14,8 @@ const createCheckerboardScene = () => {
 
   const config = {
     type: Phaser.AUTO,
-    width: 644,
-    height: 644,
+    width: 642.25,
+    height: 642.25,
     scene: [GameScene],
     parent: 'gameDiv',
   };
