@@ -21,7 +21,7 @@ const History = async () => {
 };
 
 function renderHistory(games, user) {
-  let formattedGames;
+  let formattedGames = [];
   if (games) {
     formattedGames = games.map((game, index) => {
       const g = { ...game };
