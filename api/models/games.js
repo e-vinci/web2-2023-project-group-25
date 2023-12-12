@@ -24,14 +24,14 @@ function readOneGame(id) {
   return games[indexOfGameFound];
 }
 
-function createOneGame(player1, player2, winner, moves) {
+function createOneGame(player, opponent, winner, moves) {
   const games = parse(jsonDbPath, defaultGames);
 
   const createdGame = {
     id: getNextId(),
     date: Date.now(),
-    player1: escape(player1),
-    player2: escape(player2),
+    player: escape(player),
+    opponent: escape(opponent),
     winner: escape(winner),
     moves: escape(moves),
   };

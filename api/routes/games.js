@@ -30,14 +30,14 @@ router.get('/:id', (req, res) => {
 
 // Create a game
 router.post('/', (req, res) => {
-  const player1 = req?.body?.player1?.length !== 0 ? req.body.player1 : undefined;
-  const player2 = req?.body?.player2?.length !== 0 ? req.body.player2 : undefined;
+  const player = req?.body?.player?.length !== 0 ? req.body.player : undefined;
+  const opponent = req?.body?.opponent?.length !== 0 ? req.body.opponent : undefined;
   const winner = req?.body?.winner?.length !== 0 ? req.body.winner : undefined;
   const moves = req?.body?.moves?.length !== 0 ? req.body.moves : undefined;
 
-  if (!player1 || !player2 || !winner || !moves) return res.sendStatus(400);
+  if (!player || !opponent || !winner || !moves) return res.sendStatus(400);
 
-  const createdGame = createOneGame(player1, player2, winner, moves);
+  const createdGame = createOneGame(player, opponent, winner, moves);
 
   return res.json(createdGame);
 });
