@@ -26,10 +26,7 @@ const Navbar = () => {
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                   <a class="nav-link" aria-current="page" href="#" data-uri="/">Home</a>
-                </li>                      
-                <li class="nav-item">
-                <a class="nav-link" href="#" data-uri="/chess">Chess</a>
-              </li>                         
+                </li>                     
             </ul>
               <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
               ${

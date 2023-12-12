@@ -62,7 +62,7 @@ const HomePage = () => {
   });
   playButton.addEventListener('click', () => {
     if (isAuthenticated()) {
-      Navigate('/game');
+      Navigate('/chess');
     } else {
       Navigate('/login');
     }
