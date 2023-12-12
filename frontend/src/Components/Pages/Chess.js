@@ -1,9 +1,16 @@
 import Phaser from 'phaser';
 import GameScene from '../ChessGame/indexbeta2';
+import { isAuthenticated } from '../../utils/auths';
+import Navigate from '../Router/Navigate';
 
 let game;
 
 const createCheckerboardScene = () => {
+  if (!isAuthenticated()) {
+    Navigate('/login');
+    return;
+  }
+
   const phaserGame = `
     <div id="gameDiv" class="game-container d-flex justify-content-center my-3">
     </div>
