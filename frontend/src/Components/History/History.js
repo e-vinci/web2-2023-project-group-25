@@ -121,4 +121,5 @@ function attachOnClickEventToDeleteButton() {
 
 export default History;
 
+// TODO: fix when backend not running (ligne 53)
 // TODO: Fix delete button

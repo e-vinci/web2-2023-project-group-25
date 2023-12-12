@@ -59,11 +59,11 @@ router.patch('/:id', authorize, isAdmin, (req, res) => {
   const moves = req?.body?.moves;
 
   if (
-    (!player1 && !player2 && !winner && !moves) ||
-    player1?.length === 0 ||
-    player2?.length === 0 ||
-    winner?.length === 0 ||
-    moves?.length === 0
+    (!player1 && !player2 && !winner && !moves)
+    || player1?.length === 0
+    || player2?.length === 0
+    || winner?.length === 0
+    || moves?.length === 0
   ) {
     return res.sendStatus(400);
   }
