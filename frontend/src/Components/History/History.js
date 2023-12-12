@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from '../../utils/auths';
 
 const History = async () => {
   let games;
-  const user = getAuthenticatedUser().username;
+  const user = getAuthenticatedUser()?.username;
   try {
     games = await fetch(`http://localhost:3000/games?user=${user}`).then((response) => {
       if (!response.ok)
