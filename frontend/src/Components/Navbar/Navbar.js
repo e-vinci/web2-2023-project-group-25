@@ -1,4 +1,5 @@
 // eslint-disable-next-line no-unused-vars
+import { Navbar as BootstrapNavbar } from 'bootstrap';
 import chessLogo from '../../img/ChessRumbleLogo.png';
 import { getAuthenticatedUser, isAuthenticated } from '../../utils/auths';
 
