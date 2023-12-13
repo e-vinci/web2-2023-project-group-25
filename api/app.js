@@ -20,8 +20,8 @@ app.use(cookieParser());
 
 app.use(cors(corsOptions));
 
-app.use('/users', usersRouter);
-app.use('/games', gamesRouter);
-app.use('/auths', authsRouter);
+app.use('/users', cors(corsOptions), usersRouter);
+app.use('/games', cors(corsOptions), gamesRouter);
+app.use('/auths', cors(corsOptions), authsRouter);
 
 module.exports = app;
