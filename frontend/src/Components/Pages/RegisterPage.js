@@ -21,7 +21,7 @@ const RegisterPage = () => {
                 <div class="mb-3">
                     <label for="confirmPassword" class="form-label">Confirm Password</label>
                     <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
-                    <div id="passwordError" class="text-danger"></div>
+                    <div id="passwordError" class="text-danger" ></div>
                 </div>
                 <button type="submit" class="btn btn-primary custom-btn" id="registerButton">Register</button>
             </form>
@@ -66,9 +66,9 @@ async function onRegister(e) {
     const confirmPassword = document.querySelector('#confirmPassword').value;
 
     if (password !== confirmPassword) {
-        const passwordError = document.querySelector('#passwordError');
-        passwordError.textContent = 'Les mots de passe ne correspondent pas.';
-        return; 
+      const passwordError = document.querySelector('#passwordError');
+      passwordError.textContent = 'Password does not match.';
+      return; 
     }
 
     const passwordError = document.querySelector('#passwordError');
@@ -88,10 +88,27 @@ async function onRegister(e) {
     const response = await fetch('/api/auths/register', options);
   
     if (!response.ok){
+      if(response.status === 409){
         const passwordError = document.querySelector('#passwordError');
         passwordError.textContent = 'Le username existe déjà!';
         return;
+      }
+
+      //JSON.stringify(errorResponse.errors, null, 2)
+      if(response.status === 400){
+        
+        const errorResponse = await response.json();
+
+        const formattedErrors = errorResponse.errors.join('\n');
+
+        console.log('Détails de l\'erreur :', formattedErrors);
+
+        const passwordError = document.querySelector('#passwordError');
+        passwordError.textContent = formattedErrors;
+        return;
+      }
     }
+
     passwordError.textContent = '';
   
     const authenticatedUser = await response.json();
