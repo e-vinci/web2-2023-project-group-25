@@ -80,15 +80,26 @@ async function onLogin(e) {
         'Content-Type': 'application/json',
       },
     };
-
-    //throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
   
     const response = await fetch('/api/auths/login', options);
   
     if (!response.ok) {
-      const passwordError = document.querySelector('#passwordError');
-      passwordError.textContent = 'Le mot de passe/username ne correspond pas.';
-      return; 
+      if(response.status === 401){
+        const passwordError = document.querySelector('#passwordError');
+        passwordError.textContent = 'Username or Password does not match.';
+        return; 
+      }
+      if(response.status === 400){
+        const errorResponse = await response.json();
+
+        const formattedErrors = errorResponse.errors.join('\n');
+
+        console.log('Détails de l\'erreur :', formattedErrors);
+
+        const passwordError = document.querySelector('#passwordError');
+        passwordError.textContent = formattedErrors;
+        return;
+      }
     }
 
     const passwordError = document.querySelector('#passwordError');
