@@ -1134,14 +1134,17 @@ class GameScene extends Phaser.Scene {
     // this.moves
     const winner = this.whitetime ? this.username : 'guest';
     this.cameras.main.setRotation(0);
-    this.add
-      .text(
+    const message = this.add.text(
         this.game.config.width / 2,
         this.game.config.height / 2,
         'Fin de la Partie!\nLe joueur 1 gagne!',
-        { fontSize: '48px', fill: '#0c0', fontWeight: 'bold' },
-      )
-      .setOrigin(0.5);
+        { fontSize: '48px', fill: '#0c0', fontWeight: 'bold' }
+    ).setOrigin(0.5);
+    
+    if (this.whitetime) {
+        message.setRotation(Math.PI); // Rotate by 180 degrees in radians
+    }
+    
 
     // Arrêter le jeu
     this.scene.pause(); // ou this.scene.stop();
@@ -1158,6 +1161,8 @@ class GameScene extends Phaser.Scene {
       }),
     });
   }
+
+
 }
 
 export default GameScene;
