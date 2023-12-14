@@ -6,7 +6,6 @@ const {
   deleteOneGame,
   updateOneGame,
 } = require('../models/games');
-const { authorize, isAdmin } = require('../utils/auths');
 
 const router = express.Router();
 
@@ -52,16 +51,16 @@ router.delete('/:id', (req, res) => {
 });
 
 // Update a game based on its id and new values for its parameters
-router.patch('/:id', authorize, isAdmin, (req, res) => {
-  const player1 = req?.body?.player1;
-  const player2 = req?.body?.player2;
+router.patch('/:id', (req, res) => {
+  const player = req?.body?.player;
+  const opponent = req?.body?.opponent;
   const winner = req?.body?.winner;
   const moves = req?.body?.moves;
 
   if (
-    (!player1 && !player2 && !winner && !moves)
-    || player1?.length === 0
-    || player2?.length === 0
+    (!player && !opponent && !winner && !moves)
+    || player?.length === 0
+    || opponent?.length === 0
     || winner?.length === 0
     || moves?.length === 0
   ) {
@@ -69,8 +68,8 @@ router.patch('/:id', authorize, isAdmin, (req, res) => {
   }
 
   const updatedGame = updateOneGame(req.params.id, {
-    player1,
-    player2,
+    player,
+    opponent,
     winner,
     moves,
   });
