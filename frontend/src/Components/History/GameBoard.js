@@ -40,12 +40,16 @@ class GameScene extends Phaser.Scene {
     const moveStrings = data.split(';');
 
     this.moves = moveStrings.map((moveString) => {
-      const [piece, coordStr, killedPiece] = moveString.split(':');
+      const [piece, coordStr] = moveString.split(':');
       const [sourceStr, destStr] = coordStr.split('-');
       const [sx, sy] = sourceStr.split(',').map(Number);
       const [dx, dy] = destStr.split(',').map(Number);
 
-      return { piece, sourceCoord: { x: sx, y: sy }, destCoord: { x: dx, y: dy }, killedPiece };
+      return {
+        piece,
+        sourceCoord: { x: sx, y: sy },
+        destCoord: { x: dx, y: dy },
+      };
     });
   }
 
@@ -113,7 +117,6 @@ class GameScene extends Phaser.Scene {
 
   movePiece(coordinatesBefore, coordinatesAfter, forward) {
     const pieceId = this.findPieceByCoordinates(coordinatesBefore);
-
     const piece = this.pieces[pieceId];
 
     const targetId = this.findPieceByCoordinates(coordinatesAfter);
@@ -140,6 +143,48 @@ class GameScene extends Phaser.Scene {
 
     this.piecesMap[coordinatesAfter.x][coordinatesAfter.y] = pieceId;
     this.piecesMap[coordinatesBefore.x][coordinatesBefore.y] = forward ? null : resurectedPieceId;
+
+    if (
+      (pieceId === 'BKing' || pieceId === 'WKing') &&
+      coordinatesBefore.x === 4 &&
+      (coordinatesBefore.y === 0 || coordinatesBefore.y === 7) &&
+      Math.abs(coordinatesAfter.x - coordinatesBefore.x) > 1
+    ) {
+      console.log('hey');
+      console.log(coordinatesBefore.x, coordinatesAfter.x);
+      const roquedPieceCoordinates = {
+        x: coordinatesAfter.x > coordinatesBefore.x ? 7 : 0,
+        y: coordinatesBefore.y,
+      };
+      console.log(roquedPieceCoordinates);
+      const newX = roquedPieceCoordinates.x === 7 ? 5 : 3;
+      const roquedPieceId = this.findPieceByCoordinates(roquedPieceCoordinates);
+      const roquedPiece = this.pieces[roquedPieceId];
+      roquedPiece.x = align(newX);
+      roquedPiece.y = align(roquedPieceCoordinates.y);
+      this.piecesMap[newX][roquedPieceCoordinates.y] = roquedPieceId;
+      this.piecesMap[roquedPieceCoordinates.x][roquedPieceCoordinates.y] = null;
+      console.log(this.piecesMap);
+    }
+    if (
+      (pieceId === 'BKing' || pieceId === 'WKing') &&
+      coordinatesAfter.x === 4 &&
+      (coordinatesAfter.y === 0 || coordinatesAfter.y === 7) &&
+      Math.abs(coordinatesBefore.x - coordinatesAfter.x) > 1
+    ) {
+      console.log('yeh');
+      const roquedPieceCoordinates = {
+        x: coordinatesAfter.x > coordinatesBefore.x ? 0 : 7,
+        y: coordinatesBefore.y,
+      };
+      const newX = roquedPieceCoordinates.x === 7 ? 5 : 3;
+      const roquedPieceId = this.findPieceByCoordinates({ x: newX, y: coordinatesBefore.y });
+      const roquedPiece = this.pieces[roquedPieceId];
+      roquedPiece.x = align(roquedPieceCoordinates.x);
+      roquedPiece.y = align(roquedPieceCoordinates.y);
+      this.piecesMap[roquedPieceCoordinates.x][roquedPieceCoordinates.y] = roquedPieceId;
+      this.piecesMap[newX][roquedPieceCoordinates.y] = null;
+    }
   }
 
   initializePieces() {

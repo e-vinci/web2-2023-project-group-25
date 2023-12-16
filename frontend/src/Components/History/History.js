@@ -122,4 +122,5 @@ function attachOnClickEventToDeleteButton() {
 export default History;
 
 // TODO: fix when backend not running (ligne 53)
-// TODO: Fix delete button
+// TODO: fix refresh on delete
+// TODO: add time on game date
