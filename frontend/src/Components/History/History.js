@@ -30,6 +30,9 @@ function renderHistory(games, user) {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
       });
       return g;
     });
@@ -120,7 +123,3 @@ function attachOnClickEventToDeleteButton() {
 }
 
 export default History;
-
-// TODO: fix when backend not running (ligne 53)
-// TODO: fix refresh on delete
-// TODO: add time on game date
