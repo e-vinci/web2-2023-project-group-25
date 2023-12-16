@@ -85,7 +85,7 @@ async function onRegister(e) {
       },
     };
   
-    const response = await fetch('/api/auths/register', options);
+    const response = await fetch('http://localhost:3000/auths/register', options);
   
     if (!response.ok){
       if(response.status === 409){
@@ -94,7 +94,6 @@ async function onRegister(e) {
         return;
       }
 
-      //JSON.stringify(errorResponse.errors, null, 2)
       if(response.status === 400){
         
         const errorResponse = await response.json();
