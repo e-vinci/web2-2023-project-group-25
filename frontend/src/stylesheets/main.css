@@ -1,10 +1,11 @@
 
+/* chess image homepage */
 .chessImage{
   width: 60%;
   height: 60%;
-  
-  
 }
+
+/* background image of homepage */
 .bg-custom-color {
   background-image: url('../img/background.jpg');
   background-size: cover;
@@ -13,12 +14,22 @@
   height: 100%;
 }
 
+/* play button */
 .custom-btn {
   width: 300px;
   background-color : #2c3e50 !important;
   border-color: #2c3e50 !important ;
   color: black ;
+  background-color: #2c3e50; 
+  transition: background-color 0.3s ease, color 0.3s ease;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
 }
+
+.custom-btn:hover {
+  background-color: #000000; /* Nouvelle couleur de fond au survol (noir dans cet exemple) */
+  color: #ffffff; /* Nouvelle couleur du texte au survol (blanc dans cet exemple) */
+}
+
 
 .btn-primary { 
   color: #ffffff;
@@ -26,28 +37,45 @@
 
 
 
-/* Style de base pour la custom navbar */
+/* style for navbar */
 .custom-navbar {
-  background-color: #2c3e50; /* Couleur de fond sombre */
-  padding: 10px; /* Marge intérieure pour l'espace autour du contenu */
-  text-align: center; /* Alignement central du texte */
+  background-color: #2c3e50; 
+  padding: 10px; 
+  text-align: center; 
 }
 
-/* Style des liens dans la custom navbar */
+/* navbar */
 .custom-navbar a {
-  color: #ecf0f1; /* Couleur du texte claire */
-  text-decoration: none; /* Pas de soulignement sur les liens */
-  padding: 10px 20px; /* Marge intérieure pour l'espace autour du texte */
-  margin: 0 5px; /* Marge à gauche et à droite des liens pour l'espace */
-  border-radius: 5px; /* Coins arrondis */
-  transition: background-color 0.3s ease; /* Transition douce de la couleur de fond */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  color: #ecf0f1; 
+  text-decoration: none; 
+  padding: 10px 20px; 
+  margin: 0 5px; 
+  border-radius: 5px; 
+  transition: background-color 0.3s ease;
+   
 }
 
-/* Style des liens au survol */
+
 .custom-navbar a:hover {
-  background-color: #34495e; /* Couleur de fond sombre au survol */
+  background-color: #34495e !important; 
 }
+/* style for form login and register */
+.custom-form-label {
+  color: white;
+}
+
+/* style for history table*/
+.custom-table{
+  background-color: #34495e;
+  color :  #34495e !important ;
+}
+
+
+
+
+
+
+
 
 
 
