@@ -12,26 +12,26 @@ const LoginPage = () => {
     
     // Creation of the login page 
     const loginPageContent =`
-    <div class="container login-container">
-        <h2 class="text-center mb-4">Login</h2>
+    <div class="container">
+        <h2 class="text-center mb-4">Connexion</h2>
             <form>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                    <label for="username" class="form-label custom-form-label ">Pseudo</label>
+                    <input type="text" class="form-control" id="username" placeholder="Entrez votre Pseudo">
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                    <label for="password" class="form-label custom-form-label ">Mot de passe</label>
+                    <input type="password" class="form-control " id="password" placeholder="Entrez votre mot de passe">
                     <div id="passwordError" class="text-danger"></div>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
-                <button type="submit" class="btn btn-primary  custom-btn" id="loginButton">Login</button>
+                <button type="submit" class="btn btn-primary  custom-btn" id="loginButton">Se connecter </button>
             </form>
-            <div class="mt-3 text-center">
-                <p>Don't have an account? <a href="/register" data-uri="/register">Register here</a></p>
+            <div class="mt-5 text-center ">
+                <p class="fs-4">Vous n'avez pas de compte ?<a href="/register" data-uri="/register">S'inscrire ici</a></p>
             </div>
     </div>
     `;
@@ -40,20 +40,20 @@ const main = document.querySelector('main');
 main.innerHTML = loginPageContent;
 
 const loginButton = document.getElementById('loginButton');
-
+// animation button login
 loginButton.addEventListener('mouseover', () => {
   anime({
     targets: loginButton,
-    width: '+=100px', // Increase width by 50 pixels (adjust as needed)
+    width: '+=150px', 
     easing: 'linear',
-    duration: 150,
+    duration: 300,
   });
 });
 
 loginButton.addEventListener('mouseout', () => {
   anime({
     targets: loginButton,
-    width: '-=100px', // Decrease width by 50 pixels (adjust as needed)
+    width: '-=150px', 
     easing: 'linear',
     duration: 300,
   });
@@ -63,7 +63,7 @@ const login = document.querySelector("form");
 login.addEventListener('submit', onLogin);
 
 
-// function qui va appeler l'api pour se connecter
+// function that calls the api to connect
 async function onLogin(e) {
     e.preventDefault();
   

@@ -39,13 +39,14 @@ function renderHistory(games, user) {
   } else formattedGames = [];
 
   const history = `
-  <div class="table-responsive">
+  <div class="table-responsive custom-table">
     <table class='table table-hover'>
       <thead>
+        
         <th class='col'><h6>#</h6></th>
         <th class='col'><h6>Date</h6></th>
-        <th class='col'><h6>Result</h6></th>
-        <th class='col'><h6>Opponent</h6></th>
+        <th class='col'><h6>Resultat</h6></th>
+        <th class='col'><h6>Adversaire</h6></th>
         <th class='col'></th>
       </thead>
       <tbody>

@@ -8,25 +8,25 @@ const RegisterPage = () => {
 
     const registerPageContent =`
         <div class="container register-container">
-            <h2 class="text-center mb-4">Register</h2>
+            <h2 class="text-center mb-4 text-white"> Inscription</h2>
             <form id="registrationForm" action="/register" method="post">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+                    <label for="username" class="form-label custom-form-label ">Pseudo</label>
+                    <input type="text" class="form-control" id="username" placeholder="Entrez votre Pseudo" required>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                    <label for="password" class="form-label custom-form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe" required>
                 </div>
                 <div class="mb-3">
-                    <label for="confirmPassword" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                    <label for="confirmPassword" class="form-label custom-form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmez votre mot de passe" required>
                     <div id="passwordError" class="text-danger" ></div>
                 </div>
-                <button type="submit" class="btn btn-primary custom-btn" id="registerButton">Register</button>
+                <button type="submit" class="btn btn-primary  custom-btn" id="registerButton">S'inscrire</button>
             </form>
             <div class="mt-3 text-center">
-                <p>Already have an account? <a href="/login">Login here</a></p>
+                <p class="fs-4">Vous avez déjà un compte ? <a href="/login">Se connecter</a></p>
             </div>
         </div>`;
     
@@ -35,22 +35,22 @@ const main = document.querySelector('main');
 main.innerHTML = registerPageContent;
 
 const registerButton = document.getElementById('registerButton');
-
+// animation register page
 registerButton.addEventListener('mouseover', () => {
   anime({
     targets: registerButton,
-    width: '+=100px', 
+    width: '+=150px', 
     easing: 'linear',
-    duration: 150,
+    duration: 300,
   });
 });
 
 registerButton.addEventListener('mouseout', () => {
   anime({
     targets: registerButton,
-    width: '-=100px', 
+    width: '-=150px', 
     easing: 'linear',
-    duration: 150,
+    duration: 300,
   });
 });
 

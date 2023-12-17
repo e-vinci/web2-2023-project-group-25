@@ -7,9 +7,9 @@ import { isAuthenticated } from '../../utils/auths';
 
 const HomePage = () => {
   clearPage();
-
+ // Creation of the homepage 
   const homePageContent = `
-    <div class="container text-center overflow-auto ">
+    <div class="container text-center  ">
       <div class="row pb-5">
         <div class="col">
           <h3 class="display-3" id="welcomeTitle">Bienvenue sur Chess Rumble !</h3>
@@ -25,10 +25,11 @@ const HomePage = () => {
         </div>
       </div>
 
+      
       <div class="row pb-5">
         <div class="col">
-          <button type="submit" class="btn btn-lg btn-primary custom-btn" id="playButton">Play</button>
-        </div>
+        <button type="submit" class="btn btn-lg  btn-primary custom-btn " id="playButton">Jouer</button>
+      </div>
       </div>
 
       <div class="row">
@@ -44,6 +45,7 @@ const HomePage = () => {
   const main = document.querySelector('main');
   main.innerHTML = homePageContent;
 
+  // animation button play 
   const playButton = document.getElementById('playButton');
   playButton.addEventListener('mouseenter', () => {
     anime({
@@ -60,6 +62,7 @@ const HomePage = () => {
       duration: 300,
     });
   });
+
   playButton.addEventListener('click', () => {
     if (isAuthenticated()) {
       Navigate('/chess');
