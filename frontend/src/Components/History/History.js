@@ -5,7 +5,7 @@ const History = async () => {
   let games;
   const user = getAuthenticatedUser()?.username;
   try {
-    games = await fetch(`http://localhost:3000/games?user=${user}`).then((response) => {
+    games = await fetch(`https://chessrumble.azurewebsites.net/games?user=${user}`).then((response) => {
       if (!response.ok)
         throw new Error(`fetch error : ${response.status} : ${response.statusText}`);
       return response.json();
@@ -118,7 +118,7 @@ function attachOnClickEventToDeleteButton() {
   const deleteButton = document.querySelectorAll('.confirm-delete-button');
   deleteButton.forEach((button) => {
     button.addEventListener('click', () => {
-      fetch(`http://localhost:3000/games/${button.getAttribute('value')}`, { method: 'DELETE' });
+      fetch(`https://chessrumble.azurewebsites.net/games/${button.getAttribute('value')}`, { method: 'DELETE' });
     });
   });
 }

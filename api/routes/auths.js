@@ -4,21 +4,21 @@ const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 
-// Fonction pour faire les tests de validation Register 
+// Function to do Register validation tests
 const registrationValidationRules = () => {
   return [
     body('username').notEmpty().withMessage('Username is required').isLength({ min: 3, max: 20 }).withMessage('Username must be between 3 and 20 characters'),
     body('password').notEmpty().withMessage('Password is required').isLength({ min: 8, max: 30 }).withMessage('Password must be between 8 and 30 characters'),
   ];
 };
-// Fonction pour faire les tests de validation Login
+//Function to perform Login validation tests
 const loginValidationRules = () => {
   return [
     body('username').notEmpty().withMessage('Username is required'),
     body('password').notEmpty().withMessage('Password is required'),
   ];
 };
-
+//Function to see if there are errors if yes returns the errors otherwise returns next
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   console.log(errors);

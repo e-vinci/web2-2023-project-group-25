@@ -85,7 +85,7 @@ async function onRegister(e) {
       },
     };
   
-    const response = await fetch('http://localhost:3000/auths/register', options);
+    const response = await fetch('https://chessrumble.azurewebsites.net/auths/register', options);
   
     if (!response.ok){
       if(response.status === 409){

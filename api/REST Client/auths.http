@@ -1,38 +1,29 @@
-@baseUrl = http://localhost:3000
+@baseUrl = https://chessrumble.azurewebsites.net/
 
-### Try to login an unknow user
+### Try to login an unknow 
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-    "username":"unknown",
-    "password":"admin"
-}
-
-### Login the default admin
-POST {{baseUrl}}/auths/login
-Content-Type: application/json
-
-{
-    "username":"admin",
-    "password":"admin"
+    "username":"nobody",
+    "password":"nobody"
 }
 
 
-### Create the manager user
+### Create an user
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-    "username":"manager",
-    "password":"manager"
+    "username":"Emma",
+    "password":"Emma"
 }
 
-### Login the manager user
+### Login an  user
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-    "username":"manager",
-    "password":"manager"
+    "username":"Emma",
+    "password":"Emma"
 }
