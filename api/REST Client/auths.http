@@ -19,6 +19,15 @@ Content-Type: application/json
     "password":"Emma"
 }
 
+### Create an existing user
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+    "username":"Emma",
+    "password":"Emma"
+}
+
 ### Login an  user
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
